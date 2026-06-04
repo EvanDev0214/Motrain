@@ -5,7 +5,12 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "lint": "turbo run lint && eslint eslint.config.js"
+    "dev": "turbo run dev",
+    "dev:backend": "turbo run -F backend dev",
+    "lint": "turbo run lint && eslint eslint.config.js",
+    "lint:backend": "turbo run -F backend lint",
+    "check-types": "turbo run check-types",
+    "check-types:backend": "turbo run -F backend check-types"
   },
   "keywords": [
     "fitness",
