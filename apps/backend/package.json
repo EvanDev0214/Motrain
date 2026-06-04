@@ -7,19 +7,26 @@
     "start": "node dist/server.js",
     "build": "tsup",
     "lint": "eslint .",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "db:generate": "read -p 'Migration name: ' name && drizzle-kit generate --name=$name",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio"
   },
   "author": "Evan",
   "license": "ISC",
   "packageManager": "pnpm@10.19.0",
   "dependencies": {
     "dotenv": "17.4.2",
-    "express": "5.2.1"
+    "drizzle-orm": "0.45.2",
+    "express": "5.2.1",
+    "pg": "8.21.0"
   },
   "devDependencies": {
     "@repo/tsconfig": "workspace:*",
     "@types/express": "5.0.6",
     "@types/node": "25.9.1",
+    "@types/pg": "8.20.0",
+    "drizzle-kit": "0.31.10",
     "tsup": "8.5.1",
     "tsx": "4.22.4"
   }
