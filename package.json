@@ -4,10 +4,6 @@
   "description": "A fitness tracking application for recording workouts, tracking progress, and achieving health goals",
   "type": "module",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -22,5 +18,8 @@
   "packageManager": "pnpm@10.19.0",
   "engines": {
     "node": ">=22.0.0"
+  },
+  "devDependencies": {
+    "turbo": "^2.9.16"
   }
 }
