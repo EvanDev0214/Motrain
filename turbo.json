@@ -1,9 +1,15 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
+  "globalEnv": [
+    "PORT",
+    "HOST",
+    "NODE_ENV",
+    "DATABASE_URL"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": []
+      "outputs": ["dist/**"]
     },
     "check-types": {
       "dependsOn": ["^check-types"]
