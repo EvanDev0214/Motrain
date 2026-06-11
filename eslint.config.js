@@ -52,6 +52,9 @@ export default defineConfig([
         named: 'never',
         asyncArrow: 'always'
       }],
+      '@typescript-eslint/no-unused-vars': ['error', {
+        argsIgnorePattern: '^_'
+      }],
       'no-console': 'warn',
       'no-var': 'error',
       'prefer-template': 'error',
