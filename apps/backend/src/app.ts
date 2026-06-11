@@ -8,6 +8,7 @@ const app = express();
 app.use(helmetMiddleware);
 app.use(corsMiddleware);
 app.use(httpLogger);
+app.use(express.json());
 
 app.get('/', (_req, res) => {
   res.send('Hello World!');
