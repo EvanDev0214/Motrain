@@ -79,7 +79,7 @@ export const jsonParseErrorHandler = (
   if (err instanceof SyntaxError && 'body' in err) {
     warnLogger({
       code: 'JSON_PARSE_ERROR',
-      url: req.url,
+      url: req.originalUrl,
       method: req.method,
       message: 'Invalid JSON format'
     });
