@@ -1,5 +1,6 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
+import { logger } from '@/utils/logger';
 
 const databaseURL = process.env.DATABASE_URL;
 
@@ -15,7 +16,7 @@ const pool = new Pool({
 });
 
 pool.on('error', (err) => {
-  console.error('Unexpected error on idle client', err);
+  logger.error(err, 'Unexpected error on idle client');
 });
 
 export const db = drizzle(pool);

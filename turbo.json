@@ -4,7 +4,8 @@
     "PORT",
     "HOST",
     "NODE_ENV",
-    "DATABASE_URL"
+    "DATABASE_URL",
+    "CORS_ORIGIN"
   ],
   "tasks": {
     "build": {
