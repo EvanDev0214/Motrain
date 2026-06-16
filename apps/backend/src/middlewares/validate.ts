@@ -27,12 +27,21 @@ const validateMiddleware = (schema: z.ZodType<RequestSchema>) => (
     next();
   } catch (err) {
     if (err instanceof z.ZodError) {
-      const errors = err.issues.map(issue => ({
-        source: issue.path[0] as 'body' | 'query' | 'params',
-        field: issue.path.slice(1).join('.'),
-        code: issue.code,
-        message: issue.message
-      }));
+      const errors = err.issues.map(issue => {
+        const [head, ...rest] = issue.path;
+
+        const source: 'body' | 'query' | 'params' | 'root' =
+          head === 'body' || head === 'query' || head === 'params' ? head : 'root';
+
+        const field = rest.join('.');
+
+        return {
+          source,
+          ...(field && { field }),
+          code: issue.code,
+          message: issue.message
+        };
+      });
 
       return next(new Validation422Error('Validation Error', errors));
     }

@@ -40,8 +40,8 @@ export class Conflict409Error extends AppError {
 }
 
 export type ValidationErrorDetail = {
-  source: 'body' | 'query' | 'params',
-  field: string,
+  source: 'body' | 'query' | 'params' | 'root',
+  field?: string,
   code: string,
   message: string
 };
