@@ -53,6 +53,9 @@ importers:
       pg:
         specifier: 8.21.0
         version: 8.21.0
+      pg-error-enum:
+        specifier: 2.0.1
+        version: 2.0.1
       pino-http:
         specifier: 11.0.0
         version: 11.0.0
@@ -1671,6 +1674,10 @@ packages:
   pg-connection-string@2.13.0:
     resolution: {integrity: sha512-EMnU9E2fSULdsbErBbMaXJvFeD9B4+nPcM3f+4lsiCR0BHLPrLVjv3DbyM2hgQQviKJaTWIRRTjKjWlHg3p2ig==}
 
+  pg-error-enum@2.0.1:
+    resolution: {integrity: sha512-j6V7AadTAEDIKmc4n33tcJ8+8ScwDvBGUr8q4SUDjmDWUZF8iFyHYJ9Lz9yRYZ/Ajv9v7tdVOKuN7a87GfndKQ==}
+    engines: {node: ^22.12.0 || >24.0.0}
+
   pg-int8@1.0.1:
     resolution: {integrity: sha512-WCtabS6t3c8SkpDBUlb1kjOs7l66xsGdKpIPZsg4wR+B3+u9UAum2odSsF9tnvxg80h4ZxLWMy4pRjOsFIqQpw==}
     engines: {node: '>=4.0.0'}
@@ -3275,6 +3282,8 @@ snapshots:
     optional: true
 
   pg-connection-string@2.13.0: {}
+
+  pg-error-enum@2.0.1: {}
 
   pg-int8@1.0.1: {}
 

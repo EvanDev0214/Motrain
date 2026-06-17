@@ -1,6 +1,9 @@
 import type { Request, Response, NextFunction } from 'express';
+import { DatabaseError } from 'pg';
+import { PostgresError } from 'pg-error-enum';
 import { AppError, Validation422Error } from '@/utils/error';
-import { errorLogger, warnLogger } from '@/utils/logger';
+import { errorLogger, logger, warnLogger } from '@/utils/logger';
+import { PG_UNIQUE_FIELD_LABELS } from '@/constants/dbField';
 
 export const errorHandler = (
   err: unknown,
@@ -32,6 +35,10 @@ export const errorHandler = (
       code: err.code,
       message: err.message
     });
+  }
+
+  if (err instanceof Error && err.cause instanceof DatabaseError) {
+    return pgErrorHandler(err as Error & { cause: DatabaseError }, req, res);
   }
 
   // Default to 500 Internal Server Error
@@ -91,4 +98,35 @@ export const jsonParseErrorHandler = (
     });
   }
   next(err);
+};
+
+const pgErrorHandler = (
+  err: Error & { cause: DatabaseError },
+  req: Request,
+  res: Response
+) => {
+  const { code, detail } = err.cause;
+
+  if (code === PostgresError.UNIQUE_VIOLATION) {
+    const field = detail?.match(/Key \((\w+)\)/)?.[1];
+    const label = field ? PG_UNIQUE_FIELD_LABELS[field] : undefined;
+
+    return res.status(409).json({
+      status: 'error',
+      code: label ? `${label.toUpperCase()}_EXISTS` : 'DUPLICATE_ENTRY',
+      message: label ? `${label} already exists.` : 'Resource already exists.'
+    });
+  }
+
+  logger.error({
+    err,
+    url: req.originalUrl,
+    method: req.method
+  }, 'Database error occurred');
+
+  res.status(500).json({
+    status: 'error',
+    code: 'INTERNAL_SERVER_ERROR',
+    message: 'An unexpected error occurred'
+  });
 };
