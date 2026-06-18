@@ -9,7 +9,9 @@ type LogInfo = {
 };
 
 type ErrorLogInfo = LogInfo & {
+  service?: string;
   statusCode: number;
+  cause?: unknown;
   stack?: string;
 };
 
@@ -32,9 +34,11 @@ export const logger = httpLogger.logger;
 
 export const errorLogger = (info: ErrorLogInfo) => {
   logger.error({
+    service: info.service,
     code: info.code,
     url: sanitizeUrl(info.url),
     method: info.method,
+    cause: info.cause,
     stack: isDev ? info.stack : undefined
   }, `[${info.statusCode}] ${info.message}`);
 };

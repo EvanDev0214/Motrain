@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { DatabaseError } from 'pg';
 import { PostgresError } from 'pg-error-enum';
-import { AppError, Validation422Error } from '@/utils/error';
+import { AppError, ExternalServiceError, Validation422Error } from '@/utils/error';
 import { errorLogger, logger, warnLogger } from '@/utils/logger';
 import { PG_UNIQUE_FIELD_LABELS } from '@/constants/dbField';
 
@@ -37,6 +37,24 @@ export const errorHandler = (
     });
   }
 
+  if (err instanceof ExternalServiceError) {
+    errorLogger({
+      service: err.service,
+      code: 'INTERNAL_SERVER_ERROR',
+      statusCode: 500,
+      url: req.originalUrl,
+      method: req.method,
+      message: err.message,
+      cause: err.cause
+    });
+
+    return res.status(500).json({
+      status: 'error',
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'An unexpected error occurred'
+    });
+  }
+
   if (err instanceof Error && err.cause instanceof DatabaseError) {
     return pgErrorHandler(err as Error & { cause: DatabaseError }, req, res);
   }
@@ -49,7 +67,8 @@ export const errorHandler = (
     url: req.originalUrl,
     method: req.method,
     message: unknownErr.message,
-    stack: unknownErr.stack
+    stack: unknownErr.stack,
+    cause: unknownErr.cause
   });
 
   res.status(500).json({
