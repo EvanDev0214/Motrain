@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import { authService } from '@/services/auth';
+import { emailVerificationService } from '@/services/emailVerification';
 
 export const register = async (
   req: Request,
@@ -13,10 +14,13 @@ export const register = async (
     password
   });
 
+  await emailVerificationService.sendOTP(newUser.id, newUser.email);
+
   res.status(201).json({
     status: 'success',
+    message: 'Verification email sent',
     data: {
-      id: newUser.id,
+      userId: newUser.id,
       email: newUser.email,
       createdAt: newUser.createdAt
     }
