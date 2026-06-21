@@ -10,9 +10,11 @@ const NO_SPECIAL_CHARS = {
   message: '暱稱只能包含中文、英文字母及數字'
 };
 
+const emailField = z.email('請輸入有效的信箱格式').max(255, '信箱長度不可超過 255 個字元');
+
 export const registerSchema = z.object({
   body: z.object({
-    email: z.email('請輸入有效的信箱格式').max(255, '信箱長度不可超過 255 個字元'),
+    email: emailField,
     password: z.string().min(8, '密碼長度至少為 8 個字元').max(30, '密碼長度不可超過 30 個字元').regex(
       ALPHANUMERIC_ONLY.pattern,
       ALPHANUMERIC_ONLY.message
@@ -30,14 +32,14 @@ export const registerSchema = z.object({
 
 export const verifyEmailOtpSchema = z.object({
   body: z.object({
-    email: z.email('請輸入有效的信箱格式').max(255, '信箱長度不可超過 255 個字元'),
+    email: emailField,
     otp: z.string().min(6, 'OTP 驗證碼長度至少為 6 個字元').max(6, 'OTP 驗證碼長度不可超過 6 個字元')
   })
 });
 
 export const resendEmailOtpSchema = z.object({
   body: z.object({
-    email: z.email('請輸入有效的信箱格式').max(255, '信箱長度不可超過 255 個字元')
+    email: emailField
   })
 });
 
