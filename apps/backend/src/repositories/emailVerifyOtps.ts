@@ -1,6 +1,7 @@
 
 import { db } from '@/db/db';
 import { emailVerifyOtps } from '@/db/schemas/emailVerifyOtps';
+import { eq, sql } from 'drizzle-orm';
 
 export const emailVerifyOtpsRepository = {
   upsert: async (
@@ -25,6 +26,27 @@ export const emailVerifyOtpsRepository = {
         createdAt: now
       }
     });
+  },
+  findByEmail: async (
+    email: Email
+  ) => {
+    const [data] = await db.select().from(emailVerifyOtps)
+      .where(eq(emailVerifyOtps.email, email));
+
+    return data;
+  },
+  incrementAttempts: async (
+    userId: UUID
+  ) => {
+    await db.update(emailVerifyOtps)
+      .set({ attempts: sql`${emailVerifyOtps.attempts} + 1` })
+      .where(eq(emailVerifyOtps.userId, userId));
+  },
+  deleteByUserId: async (
+    userId: UUID
+  ) => {
+    await db.delete(emailVerifyOtps)
+      .where(eq(emailVerifyOtps.userId, userId));
   }
 };
 

@@ -1,6 +1,7 @@
-import type { RegisterInput } from '@/schemas/auth';
+import { eq } from 'drizzle-orm';
 import { db } from '@/db/db';
 import { users } from '@/db/schemas/users';
+import type { RegisterInput } from '@/schemas/auth';
 
 type CreateUserData = Omit<RegisterInput, 'password'> & {
   passwordHash: string
@@ -20,6 +21,13 @@ export const userRepository = {
     });
 
     return newUser!;
+  },
+  markEmailAsVerified: async (
+    userId: UUID
+  ) => {
+    await db.update(users).set({
+      emailVerifiedAt: new Date()
+    }).where(eq(users.id, userId));
   }
 };
 

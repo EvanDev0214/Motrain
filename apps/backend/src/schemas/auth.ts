@@ -12,7 +12,7 @@ const NO_SPECIAL_CHARS = {
 
 export const registerSchema = z.object({
   body: z.object({
-    email: z.string().min(1, '信箱不可為空').email().max(255, '信箱長度不可超過 255 個字元'),
+    email: z.email('請輸入有效的信箱格式').max(255, '信箱長度不可超過 255 個字元'),
     password: z.string().min(8, '密碼長度至少為 8 個字元').max(30, '密碼長度不可超過 30 個字元').regex(
       ALPHANUMERIC_ONLY.pattern,
       ALPHANUMERIC_ONLY.message
@@ -25,6 +25,13 @@ export const registerSchema = z.object({
   }).refine(data => data.password === data.confirmPassword, {
     message: '確認密碼與密碼不一致',
     path: ['confirmPassword']
+  })
+});
+
+export const verifyEmailOtpSchema = z.object({
+  body: z.object({
+    email: z.email('請輸入有效的信箱格式').max(255, '信箱長度不可超過 255 個字元'),
+    otp: z.string().min(6, 'OTP 驗證碼長度至少為 6 個字元').max(6, 'OTP 驗證碼長度不可超過 6 個字元')
   })
 });
 
