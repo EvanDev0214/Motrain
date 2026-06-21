@@ -35,4 +35,10 @@ export const verifyEmailOtpSchema = z.object({
   })
 });
 
+export const resendEmailOtpSchema = z.object({
+  body: z.object({
+    email: z.email('請輸入有效的信箱格式').max(255, '信箱長度不可超過 255 個字元')
+  })
+});
+
 export type RegisterInput = Omit<z.infer<typeof registerSchema>['body'], 'confirmPassword'>;

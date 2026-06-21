@@ -55,3 +55,21 @@ export const verifyEmailOTP = async (
     message: 'Email verified successfully'
   });
 };
+
+export const resendEmailOTP = async (
+  req: Request,
+  res: Response
+) => {
+  const { email } = req.body;
+
+  const data = await userRepository.findByEmail(email);
+
+  if (data && !data.emailVerifiedAt) {
+    await emailVerificationService.sendOTP(data.id, email);
+  }
+
+  res.status(200).json({
+    status: 'success',
+    message: 'If this email is registered, a verification code has been sent'
+  });
+};

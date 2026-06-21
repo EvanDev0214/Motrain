@@ -14,6 +14,14 @@ class EmailVerificationService {
     userId: UUID,
     to: Email
   ) {
+    const data = await this.emailVerifyOtpsRepository.findByEmail(to);
+
+    if (data) {
+      const cooldownEnd = new Date(data.createdAt.getTime() + 60 * 1000);
+
+      if (cooldownEnd > new Date()) return;
+    }
+
     const otp = generateOTP(6);
     await this.emailVerifyOtpsRepository.upsert(userId, to, otp);
     await this.emailService.send(

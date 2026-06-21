@@ -28,6 +28,14 @@ export const userRepository = {
     await db.update(users).set({
       emailVerifiedAt: new Date()
     }).where(eq(users.id, userId));
+  },
+  findByEmail: async (
+    email: Email
+  ) => {
+    const result = await db.select().from(users)
+      .where(eq(users.email, email));
+
+    return result[0];
   }
 };
 
