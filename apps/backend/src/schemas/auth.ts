@@ -33,7 +33,7 @@ export const registerSchema = z.object({
 export const verifyEmailOtpSchema = z.object({
   body: z.object({
     email: emailField,
-    otp: z.string().min(6, 'OTP 驗證碼長度至少為 6 個字元').max(6, 'OTP 驗證碼長度不可超過 6 個字元')
+    otp: z.string().length(6, 'OTP 驗證碼必須為 6 位數字').regex(/^\d{6}$/, 'OTP 驗證碼必須為 6 位數字')
   })
 });
 

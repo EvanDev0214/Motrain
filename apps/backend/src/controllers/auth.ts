@@ -44,7 +44,7 @@ export const verifyEmailOTP = async (
 
   if (data.code !== otp) {
     await emailVerifyOtpsRepository.incrementAttempts(data.userId);
-    throw new BadRequest400Error('OTP validate failed', 'OTP_MISMATCH');
+    throw new BadRequest400Error('OTP validation failed', 'OTP_MISMATCH');
   }
 
   await userRepository.markEmailAsVerified(data.userId);
