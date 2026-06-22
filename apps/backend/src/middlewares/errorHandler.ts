@@ -1,6 +1,9 @@
 import type { Request, Response, NextFunction } from 'express';
-import { AppError, Validation422Error } from '@/utils/error';
+import { DatabaseError } from 'pg';
+import { PostgresError } from 'pg-error-enum';
+import { AppError, ExternalServiceError, Validation422Error } from '@/utils/error';
 import { errorLogger, warnLogger } from '@/utils/logger';
+import { PG_UNIQUE_FIELD_LABELS } from '@/constants/dbField';
 
 export const errorHandler = (
   err: unknown,
@@ -34,6 +37,28 @@ export const errorHandler = (
     });
   }
 
+  if (err instanceof ExternalServiceError) {
+    errorLogger({
+      service: err.service,
+      code: 'INTERNAL_SERVER_ERROR',
+      statusCode: 500,
+      url: req.originalUrl,
+      method: req.method,
+      message: err.message,
+      cause: err.cause
+    });
+
+    return res.status(500).json({
+      status: 'error',
+      code: 'INTERNAL_SERVER_ERROR',
+      message: 'An unexpected error occurred'
+    });
+  }
+
+  if (err instanceof Error && err.cause instanceof DatabaseError) {
+    return pgErrorHandler(err as Error & { cause: DatabaseError }, req, res);
+  }
+
   // Default to 500 Internal Server Error
   const unknownErr = err instanceof Error ? err : new Error(String(err));
   errorLogger({
@@ -42,7 +67,8 @@ export const errorHandler = (
     url: req.originalUrl,
     method: req.method,
     message: unknownErr.message,
-    stack: unknownErr.stack
+    stack: unknownErr.stack,
+    cause: unknownErr.cause
   });
 
   res.status(500).json({
@@ -91,4 +117,39 @@ export const jsonParseErrorHandler = (
     });
   }
   next(err);
+};
+
+const pgErrorHandler = (
+  err: Error & { cause: DatabaseError },
+  req: Request,
+  res: Response
+) => {
+  const { code, detail } = err.cause;
+
+  if (code === PostgresError.UNIQUE_VIOLATION) {
+    const field = detail?.match(/Key \((\w+)\)/)?.[1];
+    const label = field ? PG_UNIQUE_FIELD_LABELS[field] : undefined;
+
+    return res.status(409).json({
+      status: 'error',
+      code: label ? `${label.toUpperCase()}_EXISTS` : 'DUPLICATE_ENTRY',
+      message: label ? `${label} already exists.` : 'Resource already exists.'
+    });
+  }
+
+  errorLogger({
+    code: 'DATABASE_ERROR',
+    statusCode: 500,
+    url: req.originalUrl,
+    method: req.method,
+    message: 'Database error occurred',
+    cause: err.cause,
+    stack: err.stack
+  });
+
+  res.status(500).json({
+    status: 'error',
+    code: 'INTERNAL_SERVER_ERROR',
+    message: 'An unexpected error occurred'
+  });
 };

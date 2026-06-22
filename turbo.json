@@ -5,7 +5,11 @@
     "HOST",
     "NODE_ENV",
     "DATABASE_URL",
-    "CORS_ORIGIN"
+    "CORS_ORIGIN",
+    "RESEND_API_KEY",
+    "RESEND_FROM",
+    "RESEND_OTP_EXPIRES_MINUTES",
+    "MAX_OTP_ATTEMPTS"
   ],
   "tasks": {
     "build": {

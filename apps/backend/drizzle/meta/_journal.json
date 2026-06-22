@@ -8,6 +8,13 @@
       "when": 1780556930672,
       "tag": "20260604070850_create_users_table",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1782009178559,
+      "tag": "20260621023258_create_email_verify_otps_table",
+      "breakpoints": true
     }
   ]
 }

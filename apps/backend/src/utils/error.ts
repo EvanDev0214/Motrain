@@ -57,3 +57,14 @@ export class Validation422Error extends AppError {
     this.errors = errors;
   }
 }
+
+export class ExternalServiceError extends Error {
+  constructor(
+    public service: string,
+    message: string,
+    cause: unknown
+  ) {
+    super(message, { cause });
+    this.name = 'ExternalServiceError';
+  }
+}

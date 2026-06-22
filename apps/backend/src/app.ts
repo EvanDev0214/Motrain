@@ -9,6 +9,7 @@ import {
   routerErrorHandler,
   errorHandler
 } from '@/middlewares/errorHandler';
+import authRouter from '@/routes/auth';
 import { logger } from '@/utils/logger';
 
 const app = express();
@@ -33,9 +34,7 @@ app.get('/ready', async (_req, res) => {
   }
 });
 
-app.get('/', (_req, res) => {
-  res.send('Hello World!');
-});
+app.use('/api/auth', authRouter);
 
 app.use(routerErrorHandler);
 app.use(errorHandler);

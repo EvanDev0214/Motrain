@@ -16,13 +16,16 @@
   "license": "ISC",
   "packageManager": "pnpm@10.19.0",
   "dependencies": {
+    "argon2": "0.44.0",
     "cors": "2.8.6",
     "dotenv": "17.4.2",
     "drizzle-orm": "0.45.2",
     "express": "5.2.1",
     "helmet": "8.2.0",
     "pg": "8.21.0",
+    "pg-error-enum": "2.0.1",
     "pino-http": "11.0.0",
+    "resend": "6.12.4",
     "zod": "4.4.3"
   },
   "devDependencies": {
