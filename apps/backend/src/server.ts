@@ -1,9 +1,9 @@
 import 'dotenv/config';
+import env from '@/configs/env';
 import app from '@/app';
 import { logger } from '@/utils/logger';
 
-const PORT = Number(process.env.PORT) || 8080;
-const HOST = process.env.HOST || '0.0.0.0';
+const { PORT, HOST } = env;
 
 app.listen(PORT, HOST, () => {
   const baseUrl = HOST === '0.0.0.0' ? `http://localhost:${PORT}` : `http://${HOST}:${PORT}`;

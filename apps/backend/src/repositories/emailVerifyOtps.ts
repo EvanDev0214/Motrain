@@ -1,4 +1,4 @@
-
+import env from '@/configs/env';
 import { db } from '@/db/db';
 import { emailVerifyOtps } from '@/db/schemas/emailVerifyOtps';
 import { eq, sql } from 'drizzle-orm';
@@ -10,7 +10,7 @@ export const emailVerifyOtpsRepository = {
     otp: string
   ) => {
     const now = new Date();
-    const expiresAt = new Date(now.getTime() + Number(process.env.RESEND_OTP_EXPIRES_MINUTES) * 60 * 1000);
+    const expiresAt = new Date(now.getTime() + env.RESEND_OTP_EXPIRES_MINUTES * 60 * 1000);
 
     await db.insert(emailVerifyOtps).values({
       userId,

@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express';
+import env from '@/configs/env';
 import { authService } from '@/services/auth';
 import { emailVerificationService } from '@/services/emailVerification';
 import { emailVerifyOtpsRepository } from '@/repositories/emailVerifyOtps';
@@ -38,7 +39,7 @@ export const verifyEmailOTP = async (
 
   const data = await emailVerifyOtpsRepository.findByEmail(email);
 
-  if (!data || data.expiresAt < new Date() || data.attempts >= Number(process.env.MAX_OTP_ATTEMPTS)) {
+  if (!data || data.expiresAt < new Date() || data.attempts >= env.MAX_OTP_ATTEMPTS) {
     throw new BadRequest400Error('OTP has expired or exceeded maximum attempts', 'OTP_INVALID');
   }
 

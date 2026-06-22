@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import env from '@/configs/env';
 import { logger } from '@/utils/logger';
 
 class EmailService {
@@ -12,7 +13,7 @@ class EmailService {
     html: string
   ) {
     const { error } = await this.resend.emails.send({
-      from: process.env.RESEND_FROM!,
+      from: env.RESEND_FROM,
       to,
       subject,
       html
@@ -28,5 +29,5 @@ class EmailService {
 }
 
 export const emailService = new EmailService(
-  new Resend(process.env.RESEND_API_KEY)
+  new Resend(env.RESEND_API_KEY)
 );
