@@ -2,7 +2,7 @@ import type { Request, Response, NextFunction } from 'express';
 import { DatabaseError } from 'pg';
 import { PostgresError } from 'pg-error-enum';
 import { AppError, ExternalServiceError, Validation422Error } from '@/utils/error';
-import { errorLogger, logger, warnLogger } from '@/utils/logger';
+import { errorLogger, warnLogger } from '@/utils/logger';
 import { PG_UNIQUE_FIELD_LABELS } from '@/constants/dbField';
 
 export const errorHandler = (
@@ -137,11 +137,15 @@ const pgErrorHandler = (
     });
   }
 
-  logger.error({
-    err,
+  errorLogger({
+    code: 'DATABASE_ERROR',
+    statusCode: 500,
     url: req.originalUrl,
-    method: req.method
-  }, 'Database error occurred');
+    method: req.method,
+    message: 'Database error occurred',
+    cause: err.cause,
+    stack: err.stack
+  });
 
   res.status(500).json({
     status: 'error',
