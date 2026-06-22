@@ -6,6 +6,30 @@ import { emailVerifyOtpsRepository } from '@/repositories/emailVerifyOtps';
 import { userRepository } from '@/repositories/user';
 import { BadRequest400Error } from '@/utils/error';
 
+/**
+ * @openapi
+ * /api/auth/register:
+ *   post:
+ *     tags:
+ *       - Auth
+ *     summary: Register a new user
+ *     description: Create a new user account
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/auth/registerSchema/request'
+ *     responses:
+ *       201:
+ *         description: User created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/auth/registerSchema/response'
+ *       409:
+ *         description: "`EMAIL_EXISTS` : Email already exists"
+ */
 export const register = async (
   req: Request,
   res: Response
@@ -31,6 +55,32 @@ export const register = async (
   });
 };
 
+/**
+ * @openapi
+ * /api/auth/email/verify:
+ *   post:
+ *     tags:
+ *       - Auth
+ *     summary: Verify email with OTP
+ *     description: Verify user email address using the OTP code sent during registration
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/auth/verifyEmailOtpSchema/request'
+ *     responses:
+ *       200:
+ *         description: Email verified successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/auth/verifyEmailOtpSchema/response'
+ *       400:
+ *         description: |-
+ *           `OTP_INVALID` : OTP has expired or exceeded maximum attempts
+ *           `OTP_MISMATCH` : OTP validation failed
+ */
 export const verifyEmailOTP = async (
   req: Request,
   res: Response
@@ -57,6 +107,28 @@ export const verifyEmailOTP = async (
   });
 };
 
+/**
+ * @openapi
+ * /api/auth/email/otp:
+ *   post:
+ *     tags:
+ *       - Auth
+ *     summary: Resend email verification OTP
+ *     description: Resend a new OTP code to the user's email for verification
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/auth/resendEmailOtpSchema/request'
+ *     responses:
+ *       200:
+ *         description: OTP resent (always returns success to prevent email enumeration)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/auth/resendEmailOtpSchema/response'
+ */
 export const resendEmailOTP = async (
   req: Request,
   res: Response
