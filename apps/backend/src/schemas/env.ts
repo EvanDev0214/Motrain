@@ -18,5 +18,7 @@ export const envSchema = z.object({
   RESEND_API_KEY: requiredEnvField(),
   RESEND_FROM: requiredEnvField(),
   RESEND_OTP_EXPIRES_MINUTES: numericEnvField(),
-  MAX_OTP_ATTEMPTS: numericEnvField()
+  MAX_OTP_ATTEMPTS: numericEnvField(),
+  SWAGGER_USER: z.string().optional(),
+  SWAGGER_PASSWORD: z.string().optional()
 });

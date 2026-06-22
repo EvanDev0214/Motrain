@@ -9,7 +9,9 @@
     "RESEND_API_KEY",
     "RESEND_FROM",
     "RESEND_OTP_EXPIRES_MINUTES",
-    "MAX_OTP_ATTEMPTS"
+    "MAX_OTP_ATTEMPTS",
+    "SWAGGER_USER",
+    "SWAGGER_PASSWORD"
   ],
   "tasks": {
     "build": {
