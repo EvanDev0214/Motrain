@@ -5,7 +5,8 @@ const requiredEnvField = () => z
   .min(1, 'environment variable is required but missing or empty');
 
 const numericEnvField = () => requiredEnvField()
-  .transform(val => parseInt(val, 10))
+  .regex(/^\d+$/, 'must be a positive integer')
+  .transform(val => Number(val))
   .pipe(z.number().int().positive());
 
 export const envSchema = z.object({
