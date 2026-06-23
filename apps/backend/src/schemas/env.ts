@@ -20,5 +20,10 @@ export const envSchema = z.object({
   RESEND_OTP_EXPIRES_MINUTES: numericEnvField(),
   MAX_OTP_ATTEMPTS: numericEnvField(),
   SWAGGER_USER: z.string().optional(),
-  SWAGGER_PASSWORD: z.string().optional()
+  SWAGGER_PASSWORD: z.string().optional(),
+  JWT_ACCESS_SECRET_KEY: requiredEnvField(),
+  JWT_REFRESH_SECRET_KEY: requiredEnvField(),
+  JWT_ACCESS_EXPIRES_IN: requiredEnvField(),
+  JWT_REFRESH_EXPIRES_IN: requiredEnvField(),
+  JWT_ISS: requiredEnvField()
 });

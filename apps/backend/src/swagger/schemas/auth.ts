@@ -110,3 +110,47 @@ export const resendEmailOtpSchema: SwaggerSchema = {
     }
   }
 };
+
+export const loginSchema: SwaggerSchema = {
+  request: {
+    type: 'object',
+    required: ['email', 'password'],
+    properties: {
+      email: {
+        type: 'string',
+        format: 'email',
+        example: 'user@example.com'
+      },
+      password: {
+        type: 'string',
+        example: 'password123'
+      }
+    }
+  },
+  response: {
+    type: 'object',
+    properties: {
+      status: {
+        type: 'string',
+        example: 'success'
+      },
+      message: {
+        type: 'string',
+        example: 'Login account successfully'
+      },
+      data: {
+        type: 'object',
+        properties: {
+          accessToken: {
+            type: 'string',
+            example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+          },
+          refreshToken: {
+            type: 'string',
+            example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+          }
+        }
+      }
+    }
+  }
+};

@@ -43,4 +43,12 @@ export const resendEmailOtpSchema = z.object({
   })
 });
 
+export const loginSchema = z.object({
+  body: z.object({
+    email: emailField,
+    password: z.string().min(1, '密碼不可為空')
+  })
+});
+
 export type RegisterInput = Omit<z.infer<typeof registerSchema>['body'], 'confirmPassword'>;
+export type LoginRequest = z.infer<typeof loginSchema>['body'];

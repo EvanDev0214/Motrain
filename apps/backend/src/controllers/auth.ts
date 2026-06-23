@@ -4,6 +4,7 @@ import { authService } from '@/services/auth';
 import { emailVerificationService } from '@/services/emailVerification';
 import { emailVerifyOtpsRepository } from '@/repositories/emailVerifyOtps';
 import { userRepository } from '@/repositories/user';
+import type { LoginRequest } from '@/schemas/auth';
 import { BadRequest400Error } from '@/utils/error';
 
 /**
@@ -144,5 +145,47 @@ export const resendEmailOTP = async (
   res.status(200).json({
     status: 'success',
     message: 'If this email is registered, a verification code has been sent'
+  });
+};
+
+/**
+ * @openapi
+ * /api/auth/login:
+ *   post:
+ *     tags:
+ *       - Auth
+ *     summary: Login with email and password
+ *     description: Authenticate user and return JWT access and refresh tokens
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/auth/loginSchema/request'
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/auth/loginSchema/response'
+ *       401:
+ *         description: "`INVALID_CREDENTIALS` : Invalid email or password"
+ */
+export const login = async (
+  req: Request<unknown, unknown, LoginRequest>,
+  res: Response
+) => {
+  const { email, password } = req.body;
+
+  const { accessToken, refreshToken } = await authService.login(email, password);
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Login account successfully',
+    data: {
+      accessToken,
+      refreshToken
+    }
   });
 };
