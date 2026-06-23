@@ -15,6 +15,13 @@
       "when": 1782009178559,
       "tag": "20260621023258_create_email_verify_otps_table",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1782192999582,
+      "tag": "20260623053639_create_refresh_tokens_table",
+      "breakpoints": true
     }
   ]
 }
