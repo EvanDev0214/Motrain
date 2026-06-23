@@ -9,6 +9,7 @@ import {
   routerErrorHandler,
   errorHandler
 } from '@/middlewares/errorHandler';
+import swaggerMiddleware from '@/middlewares/swagger';
 import authRouter from '@/routes/auth';
 import { logger } from '@/utils/logger';
 
@@ -17,6 +18,7 @@ const app = express();
 app.use(helmetMiddleware);
 app.use(corsMiddleware);
 app.use(httpLogger);
+app.use(swaggerMiddleware);
 app.use(express.json());
 app.use(jsonParseErrorHandler);
 
