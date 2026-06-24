@@ -66,7 +66,10 @@ export const authMiddleware = (type: 'ACCESS' | 'REFRESH') => (
   }
 
   try {
-    const payload = jwt.verify(token, env[`JWT_${type}_SECRET_KEY`]) as UserJwtPayload;
+    const payload = jwt.verify(token, env[`JWT_${type}_SECRET_KEY`], {
+      algorithms: ['HS256'],
+      issuer: env.JWT_ISS
+    }) as UserJwtPayload;
     req.user = payload;
   } catch (err) {
     if (err instanceof jwt.JsonWebTokenError || err instanceof jwt.TokenExpiredError) {

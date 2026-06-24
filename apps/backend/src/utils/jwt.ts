@@ -4,10 +4,7 @@ import env from '@/configs/env';
 
 export const generateJwt = (
   type: 'ACCESS' | 'REFRESH',
-  payload: {
-    email: Email,
-    userId: UUID
-  }
+  payload: UserJwtData
 ) => {
   const token = jwt.sign(payload, env[`JWT_${type}_SECRET_KEY`], {
     algorithm: 'HS256',
