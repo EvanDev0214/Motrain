@@ -192,6 +192,39 @@ export const login = async (
 
 /**
  * @openapi
+ * /api/auth/logout:
+ *   post:
+ *     tags:
+ *       - Auth
+ *     summary: Logout and revoke refresh token
+ *     description: Invalidate the user's refresh token to log them out. The client should also discard the access token locally.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Logged out successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/auth/logoutSchema/response'
+ *       401:
+ *         description: "`INVALID_TOKEN` : Invalid or expired refresh token"
+ */
+export const logout = async (
+  req: Request,
+  res: Response
+) => {
+  const token = req.headers.authorization!.split(' ')[1]!;
+  await authService.logout(token, req.user!.userId);
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Logged out successfully'
+  });
+};
+
+/**
+ * @openapi
  * /api/auth/token/refresh:
  *   post:
  *     tags:

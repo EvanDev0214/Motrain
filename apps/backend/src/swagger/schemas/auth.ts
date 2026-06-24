@@ -155,6 +155,22 @@ export const loginSchema: SwaggerSchema = {
   }
 };
 
+export const logoutSchema: SwaggerSchema = {
+  response: {
+    type: 'object',
+    properties: {
+      status: {
+        type: 'string',
+        example: 'success'
+      },
+      message: {
+        type: 'string',
+        example: 'Logged out successfully'
+      }
+    }
+  }
+};
+
 export const refreshTokenSchema: SwaggerSchema = {
   response: {
     type: 'object',

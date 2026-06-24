@@ -32,6 +32,10 @@ export const refreshTokensRepository = {
       .limit(1);
 
     return result[0];
+  },
+  deleteByUserId: async (userId: UUID) => {
+    await db.delete(refreshTokens)
+      .where(eq(refreshTokens.userId, userId));
   }
 };
 

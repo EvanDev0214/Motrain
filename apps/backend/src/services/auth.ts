@@ -82,6 +82,22 @@ class AuthService {
     return { newAccessToken, newRefreshToken };
   }
 
+  async logout(token: string, userId: UUID) {
+    const storedToken = await this.refreshTokensRepository.findByUserId(userId);
+
+    if (!storedToken) {
+      throw new Unauthorized401Error('Invalid request, please login again', 'INVALID_TOKEN');
+    }
+
+    const isTokenValid = await argon2.verify(storedToken.refreshTokenHash, token);
+
+    if (!isTokenValid) {
+      throw new Unauthorized401Error('Invalid request, please login again', 'INVALID_TOKEN');
+    }
+
+    await this.refreshTokensRepository.deleteByUserId(userId);
+  }
+
 }
 
 export const authService = new AuthService(
