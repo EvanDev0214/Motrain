@@ -8,7 +8,7 @@ type RequestSchema = {
   params?: Request['params']
 };
 
-const validateMiddleware = (schema: z.ZodType<RequestSchema>) => (
+export const validateMiddleware = (schema: z.ZodType<RequestSchema>) => (
   req: Request,
   _res: Response,
   next: NextFunction
@@ -48,5 +48,3 @@ const validateMiddleware = (schema: z.ZodType<RequestSchema>) => (
     next(err);
   }
 };
-
-export default validateMiddleware;

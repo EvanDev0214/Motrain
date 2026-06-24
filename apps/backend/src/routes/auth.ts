@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import validateMiddleware from '@/middlewares/validate';
+import { validateMiddleware } from '@/middlewares/validate';
 import { loginSchema, registerSchema, resendEmailOtpSchema, verifyEmailOtpSchema } from '@/schemas/auth';
 import { register, resendEmailOTP, verifyEmailOTP, login } from '@/controllers/auth';
 
