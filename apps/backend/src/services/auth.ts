@@ -50,6 +50,38 @@ class AuthService {
       refreshToken
     };
   }
+
+  async refreshToken(
+    token: string,
+    payload: UserJwtPayload
+  ) {
+    const storedToken = await this.refreshTokensRepository.findByUserId(payload.userId);
+
+    if (!storedToken) {
+      throw new Unauthorized401Error('Invalid request, please login again', 'INVALID_TOKEN');
+    }
+
+    const isTokenValid = await argon2.verify(storedToken.refreshTokenHash, token);
+
+    if (!isTokenValid) {
+      throw new Unauthorized401Error('Invalid request, please login again', 'INVALID_TOKEN');
+    }
+
+    const newAccessToken = generateJwt('ACCESS', {
+      email: payload.email,
+      userId: payload.userId
+    });
+    const newRefreshToken = generateJwt('REFRESH', {
+      email: payload.email,
+      userId: payload.userId
+    });
+
+    const refreshTokenHash = await argon2.hash(newRefreshToken);
+    await this.refreshTokensRepository.upsert(payload.userId, refreshTokenHash);
+
+    return { newAccessToken, newRefreshToken };
+  }
+
 }
 
 export const authService = new AuthService(

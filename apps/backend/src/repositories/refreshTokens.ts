@@ -1,3 +1,4 @@
+import { eq } from 'drizzle-orm';
 import { db } from '@/db/db';
 import { refreshTokens } from '@/db/schemas/refreshTokens';
 import env from '@/configs/env';
@@ -23,6 +24,13 @@ export const refreshTokensRepository = {
         expiresAt
       }
     });
+  },
+  findByUserId: async (userId: UUID) => {
+    const result = await db.select().from(refreshTokens)
+      .where(eq(refreshTokens.userId, userId))
+      .limit(1);
+
+    return result[0];
   }
 };
 

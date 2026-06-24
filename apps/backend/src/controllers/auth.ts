@@ -189,3 +189,40 @@ export const login = async (
     }
   });
 };
+
+/**
+ * @openapi
+ * /api/auth/token/refresh:
+ *   post:
+ *     tags:
+ *       - Auth
+ *     summary: Refresh access token
+ *     description: Use a valid refresh token to obtain new access and refresh tokens
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Token refreshed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/auth/refreshTokenSchema/response'
+ *       401:
+ *         description: "`INVALID_TOKEN` : Invalid or expired refresh token"
+ */
+export const refreshToken = async (
+  req: Request,
+  res: Response
+) => {
+  const token = req.headers.authorization!.split(' ')[1]!;
+  const { newAccessToken, newRefreshToken } = await authService.refreshToken(token, req.user!);
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Token refreshed successfully',
+    data: {
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken
+    }
+  });
+};

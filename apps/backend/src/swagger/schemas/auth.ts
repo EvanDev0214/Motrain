@@ -154,3 +154,32 @@ export const loginSchema: SwaggerSchema = {
     }
   }
 };
+
+export const refreshTokenSchema: SwaggerSchema = {
+  response: {
+    type: 'object',
+    properties: {
+      status: {
+        type: 'string',
+        example: 'success'
+      },
+      message: {
+        type: 'string',
+        example: 'Token refreshed successfully'
+      },
+      data: {
+        type: 'object',
+        properties: {
+          accessToken: {
+            type: 'string',
+            example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+          },
+          refreshToken: {
+            type: 'string',
+            example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+          }
+        }
+      }
+    }
+  }
+};
