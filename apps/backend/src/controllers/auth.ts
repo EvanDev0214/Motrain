@@ -4,6 +4,7 @@ import { authService } from '@/services/auth';
 import { emailVerificationService } from '@/services/emailVerification';
 import { emailVerifyOtpsRepository } from '@/repositories/emailVerifyOtps';
 import { userRepository } from '@/repositories/user';
+import type { LoginRequest } from '@/schemas/auth';
 import { BadRequest400Error } from '@/utils/error';
 
 /**
@@ -144,5 +145,117 @@ export const resendEmailOTP = async (
   res.status(200).json({
     status: 'success',
     message: 'If this email is registered, a verification code has been sent'
+  });
+};
+
+/**
+ * @openapi
+ * /api/auth/login:
+ *   post:
+ *     tags:
+ *       - Auth
+ *     summary: Login with email and password
+ *     description: Authenticate user and return JWT access and refresh tokens
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/auth/loginSchema/request'
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/auth/loginSchema/response'
+ *       401:
+ *         description: "`INVALID_CREDENTIALS` : Invalid email or password"
+ */
+export const login = async (
+  req: Request<unknown, unknown, LoginRequest>,
+  res: Response
+) => {
+  const { email, password } = req.body;
+
+  const { accessToken, refreshToken } = await authService.login(email, password);
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Login account successfully',
+    data: {
+      accessToken,
+      refreshToken
+    }
+  });
+};
+
+/**
+ * @openapi
+ * /api/auth/logout:
+ *   post:
+ *     tags:
+ *       - Auth
+ *     summary: Logout and revoke refresh token
+ *     description: Invalidate the user's refresh token to log them out. The client should also discard the access token locally.
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Logged out successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/auth/logoutSchema/response'
+ *       401:
+ *         description: "`INVALID_TOKEN` : Invalid or expired refresh token"
+ */
+export const logout = async (
+  req: Request,
+  res: Response
+) => {
+  const token = req.headers.authorization!.split(' ')[1]!;
+  await authService.logout(token, req.user!.userId);
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Logged out successfully'
+  });
+};
+
+/**
+ * @openapi
+ * /api/auth/token/refresh:
+ *   post:
+ *     tags:
+ *       - Auth
+ *     summary: Refresh access token
+ *     description: Use a valid refresh token to obtain new access and refresh tokens
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Token refreshed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/auth/refreshTokenSchema/response'
+ *       401:
+ *         description: "`INVALID_TOKEN` : Invalid or expired refresh token"
+ */
+export const refreshToken = async (
+  req: Request,
+  res: Response
+) => {
+  const token = req.headers.authorization!.split(' ')[1]!;
+  const { newAccessToken, newRefreshToken } = await authService.refreshToken(token, req.user!);
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Token refreshed successfully',
+    data: {
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken
+    }
   });
 };
