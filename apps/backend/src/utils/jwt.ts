@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import type ms from 'ms';
+import { type StringValue } from 'ms';
 import env from '@/configs/env';
 
 export const generateJwt = (
@@ -11,7 +11,7 @@ export const generateJwt = (
 ) => {
   const token = jwt.sign(payload, env[`JWT_${type}_SECRET_KEY`], {
     algorithm: 'HS256',
-    expiresIn: env[`JWT_${type}_EXPIRES_IN`] as ms.StringValue,
+    expiresIn: env[`JWT_${type}_EXPIRES_IN`] as StringValue,
     issuer: env.JWT_ISS
   });
 

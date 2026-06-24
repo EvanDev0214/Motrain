@@ -1,5 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { db } from '@/db/db';
+import ms, { type StringValue } from 'ms';
 import { refreshTokens } from '@/db/schemas/refreshTokens';
 import env from '@/configs/env';
 
@@ -8,9 +9,9 @@ export const refreshTokensRepository = {
     userId: UUID,
     refreshTokenHash: string
   ) => {
-    const expiresDays = parseInt(env.JWT_REFRESH_EXPIRES_IN);
+    const expiresMs = ms(env.JWT_REFRESH_EXPIRES_IN as StringValue);
     const now = new Date();
-    const expiresAt = new Date(now.getTime() + expiresDays * 24 * 60 * 60 * 1000);
+    const expiresAt = new Date(now.getTime() + expiresMs);
 
     await db.insert(refreshTokens).values({
       userId,
