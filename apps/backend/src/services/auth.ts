@@ -123,6 +123,11 @@ class AuthService {
     await this.userRepository.updatePasswordByUserId(userId, passwordHash);
   }
 
+  async verifyEmailOTP(email: Email, otp: string) {
+    const { userId } = await this.emailVerificationService.verifyOTP(email, otp);
+    await this.userRepository.markEmailAsVerified(userId);
+  }
+
   async forgotPassword(email: Email) {
     const user = await this.userRepository.findByEmail(email);
 

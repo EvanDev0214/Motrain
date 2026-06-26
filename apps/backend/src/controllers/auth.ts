@@ -1,11 +1,8 @@
 import type { Request, Response } from 'express';
-import env from '@/configs/env';
 import { authService } from '@/services/auth';
 import { emailVerificationService } from '@/services/emailVerification';
-import { emailVerifyOtpsRepository } from '@/repositories/emailVerifyOtps';
 import { userRepository } from '@/repositories/user';
 import type { LoginRequest, UpdatePasswordRequest, ForgotPasswordRequest } from '@/schemas/auth';
-import { BadRequest400Error } from '@/utils/error';
 
 /**
  * @openapi
@@ -88,19 +85,7 @@ export const verifyEmailOTP = async (
 ) => {
   const { email, otp } = req.body;
 
-  const data = await emailVerifyOtpsRepository.findByEmail(email);
-
-  if (!data || data.expiresAt < new Date() || data.attempts >= env.MAX_OTP_ATTEMPTS) {
-    throw new BadRequest400Error('OTP has expired or exceeded maximum attempts', 'OTP_INVALID');
-  }
-
-  if (data.code !== otp) {
-    await emailVerifyOtpsRepository.incrementAttempts(data.userId);
-    throw new BadRequest400Error('OTP validation failed', 'OTP_MISMATCH');
-  }
-
-  await userRepository.markEmailAsVerified(data.userId);
-  await emailVerifyOtpsRepository.deleteByUserId(data.userId);
+  await authService.verifyEmailOTP(email, otp);
 
   res.status(200).json({
     status: 'success',

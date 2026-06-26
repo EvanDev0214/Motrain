@@ -1,6 +1,8 @@
+import env from '@/configs/env';
 import { emailService } from '@/services/email';
 import { emailVerifyOtpsRepository, type EmailVerifyOtpsRepository } from '@/repositories/emailVerifyOtps';
 import { generateOTP } from '@/utils/otp';
+import { BadRequest400Error } from '@/utils/error';
 
 type EmailService = typeof emailService;
 type OtpPurpose = 'email_verify' | 'password_reset';
@@ -54,6 +56,23 @@ class EmailVerificationService {
 
     const { subject, body } = otpEmailTemplates[purpose](otp);
     await this.emailService.send(to, subject, body);
+  }
+
+  async verifyOTP(email: Email, otp: string): Promise<{ userId: UUID }> {
+    const data = await this.emailVerifyOtpsRepository.findByEmail(email);
+
+    if (!data || data.expiresAt < new Date() || data.attempts >= env.MAX_OTP_ATTEMPTS) {
+      throw new BadRequest400Error('OTP has expired or exceeded maximum attempts', 'OTP_INVALID');
+    }
+
+    if (data.code !== otp) {
+      await this.emailVerifyOtpsRepository.incrementAttempts(data.userId);
+      throw new BadRequest400Error('OTP validation failed', 'OTP_MISMATCH');
+    }
+
+    await this.emailVerifyOtpsRepository.deleteByUserId(data.userId);
+
+    return { userId: data.userId };
   }
 }
 
