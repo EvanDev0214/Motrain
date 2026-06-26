@@ -128,6 +128,24 @@ class AuthService {
     await this.userRepository.markEmailAsVerified(userId);
   }
 
+  async verifyPasswordOTP(email: Email, otp: string) {
+    const { userId } = await this.emailVerificationService.verifyOTP(email, otp);
+
+    const user = await this.userRepository.findByUserId(userId);
+
+    if (!user) {
+      throw new Unauthorized401Error('User not found', 'INVALID_TOKEN');
+    }
+
+    if (!user.emailVerifiedAt) {
+      await this.userRepository.markEmailAsVerified(userId);
+    }
+
+    const resetToken = generateJwt('PASSWORD_RESET', { email: user.email, userId: user.id });
+
+    return { resetToken };
+  }
+
   async forgotPassword(email: Email) {
     const user = await this.userRepository.findByEmail(email);
 

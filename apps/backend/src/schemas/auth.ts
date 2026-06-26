@@ -70,7 +70,10 @@ export const forgotPasswordSchema = z.object({
   })
 });
 
+export const verifyPasswordOtpSchema = verifyEmailOtpSchema;
+
 export type RegisterInput = Omit<z.infer<typeof registerSchema>['body'], 'confirmPassword'>;
 export type LoginRequest = z.infer<typeof loginSchema>['body'];
 export type UpdatePasswordRequest = z.infer<typeof updatePasswordSchema>['body'];
 export type ForgotPasswordRequest = z.infer<typeof forgotPasswordSchema>['body'];
+export type VerifyPasswordOtpRequest = z.infer<typeof verifyPasswordOtpSchema>['body'];

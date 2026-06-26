@@ -234,6 +234,32 @@ export const updatePasswordSchema: SwaggerSchema = {
   }
 };
 
+export const verifyPasswordOtpSchema: SwaggerSchema = {
+  request: verifyEmailOtpSchema.request,
+  response: {
+    type: 'object',
+    properties: {
+      status: {
+        type: 'string',
+        example: 'success'
+      },
+      message: {
+        type: 'string',
+        example: 'OTP verified successfully'
+      },
+      data: {
+        type: 'object',
+        properties: {
+          resetToken: {
+            type: 'string',
+            example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+          }
+        }
+      }
+    }
+  }
+};
+
 export const forgotPasswordSchema: SwaggerSchema = {
   request: {
     type: 'object',

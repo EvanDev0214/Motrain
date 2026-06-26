@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import { authService } from '@/services/auth';
 import { emailVerificationService } from '@/services/emailVerification';
 import { userRepository } from '@/repositories/user';
-import type { LoginRequest, UpdatePasswordRequest, ForgotPasswordRequest } from '@/schemas/auth';
+import type { LoginRequest, UpdatePasswordRequest, ForgotPasswordRequest, VerifyPasswordOtpRequest } from '@/schemas/auth';
 
 /**
  * @openapi
@@ -322,5 +322,47 @@ export const forgotPassword = async (
   res.status(200).json({
     status: 'success',
     message: 'If this email is registered, a password reset code has been sent'
+  });
+};
+
+/**
+ * @openapi
+ * /api/auth/password/verify:
+ *   post:
+ *     tags:
+ *       - Auth
+ *     summary: Verify password reset OTP
+ *     description: Verify the OTP sent for password reset and return a short-lived reset token
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/auth/verifyPasswordOtpSchema/request'
+ *     responses:
+ *       200:
+ *         description: OTP verified, reset token issued
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/auth/verifyPasswordOtpSchema/response'
+ *       400:
+ *         description: |
+ *           - `OTP_INVALID` : OTP has expired or exceeded maximum attempts
+ *           - `OTP_MISMATCH` : OTP validation failed
+ */
+export const verifyPasswordOTP = async (
+  req: Request<unknown, unknown, VerifyPasswordOtpRequest>,
+  res: Response
+) => {
+  const { email, otp } = req.body;
+  const { resetToken } = await authService.verifyPasswordOTP(email, otp);
+
+  res.status(200).json({
+    status: 'success',
+    message: 'OTP verified successfully',
+    data: {
+      resetToken
+    }
   });
 };
