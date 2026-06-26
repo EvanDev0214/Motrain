@@ -64,6 +64,13 @@ export const updatePasswordSchema = z.object({
   })
 });
 
+export const forgotPasswordSchema = z.object({
+  body: z.object({
+    email: emailField
+  })
+});
+
 export type RegisterInput = Omit<z.infer<typeof registerSchema>['body'], 'confirmPassword'>;
 export type LoginRequest = z.infer<typeof loginSchema>['body'];
 export type UpdatePasswordRequest = z.infer<typeof updatePasswordSchema>['body'];
+export type ForgotPasswordRequest = z.infer<typeof forgotPasswordSchema>['body'];

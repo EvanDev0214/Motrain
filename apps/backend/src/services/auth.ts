@@ -4,11 +4,15 @@ import { userRepository, type UserRepository } from '@/repositories/user';
 import { refreshTokensRepository, type RefreshTokensRepository } from '@/repositories/refreshTokens';
 import { BadRequest400Error, Unauthorized401Error } from '@/utils/error';
 import { generateJwt } from '@/utils/jwt';
+import { emailVerificationService } from '@/services/emailVerification';
+
+type EmailVerificationService = typeof emailVerificationService;
 
 class AuthService {
   constructor(
     private userRepository: UserRepository,
-    private refreshTokensRepository: RefreshTokensRepository
+    private refreshTokensRepository: RefreshTokensRepository,
+    private emailVerificationService: EmailVerificationService
   ) {}
 
   async register(data: RegisterInput) {
@@ -118,9 +122,18 @@ class AuthService {
     const passwordHash = await argon2.hash(newPassword);
     await this.userRepository.updatePasswordByUserId(userId, passwordHash);
   }
+
+  async forgotPassword(email: Email) {
+    const user = await this.userRepository.findByEmail(email);
+
+    if (!user) return;
+
+    await this.emailVerificationService.sendOTP(user.id, user.email, 'password_reset');
+  }
 }
 
 export const authService = new AuthService(
   userRepository,
-  refreshTokensRepository
+  refreshTokensRepository,
+  emailVerificationService
 );

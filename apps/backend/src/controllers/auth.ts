@@ -4,7 +4,7 @@ import { authService } from '@/services/auth';
 import { emailVerificationService } from '@/services/emailVerification';
 import { emailVerifyOtpsRepository } from '@/repositories/emailVerifyOtps';
 import { userRepository } from '@/repositories/user';
-import type { LoginRequest, UpdatePasswordRequest } from '@/schemas/auth';
+import type { LoginRequest, UpdatePasswordRequest, ForgotPasswordRequest } from '@/schemas/auth';
 import { BadRequest400Error } from '@/utils/error';
 
 /**
@@ -302,5 +302,40 @@ export const updatePassword = async (
   res.status(200).json({
     status: 'success',
     message: 'Password updated successfully'
+  });
+};
+
+/**
+ * @openapi
+ * /api/auth/password/forgot:
+ *   post:
+ *     tags:
+ *       - Auth
+ *     summary: Request a password reset code
+ *     description: Send a password reset OTP to the user's email. Always returns success to prevent email enumeration.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/auth/forgotPasswordSchema/request'
+ *     responses:
+ *       200:
+ *         description: Password reset code sent (always returns success to prevent email enumeration)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/auth/forgotPasswordSchema/response'
+ */
+export const forgotPassword = async (
+  req: Request<unknown, unknown, ForgotPasswordRequest>,
+  res: Response
+) => {
+  const { email } = req.body;
+  await authService.forgotPassword(email);
+
+  res.status(200).json({
+    status: 'success',
+    message: 'If this email is registered, a password reset code has been sent'
   });
 };

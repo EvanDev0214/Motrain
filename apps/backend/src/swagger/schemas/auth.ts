@@ -233,3 +233,30 @@ export const updatePasswordSchema: SwaggerSchema = {
     }
   }
 };
+
+export const forgotPasswordSchema: SwaggerSchema = {
+  request: {
+    type: 'object',
+    required: ['email'],
+    properties: {
+      email: {
+        type: 'string',
+        format: 'email',
+        example: 'user@example.com'
+      }
+    }
+  },
+  response: {
+    type: 'object',
+    properties: {
+      status: {
+        type: 'string',
+        example: 'success'
+      },
+      message: {
+        type: 'string',
+        example: 'If this email is registered, a password reset code has been sent'
+      }
+    }
+  }
+};
