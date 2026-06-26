@@ -36,6 +36,17 @@ export const userRepository = {
       .where(eq(users.email, email));
 
     return result[0];
+  },
+  findByUserId: async (userId: UUID) => {
+    const result = await db.select().from(users)
+      .where(eq(users.id, userId));
+
+    return result[0];
+  },
+  updatePasswordByUserId: async (userId: UUID, passwordHash: string) => {
+    await db.update(users)
+      .set({ passwordHash })
+      .where(eq(users.id, userId));
   }
 };
 

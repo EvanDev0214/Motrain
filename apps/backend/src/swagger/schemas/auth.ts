@@ -199,3 +199,37 @@ export const refreshTokenSchema: SwaggerSchema = {
     }
   }
 };
+
+export const updatePasswordSchema: SwaggerSchema = {
+  request: {
+    type: 'object',
+    required: ['oldPassword', 'newPassword', 'confirmPassword'],
+    properties: {
+      oldPassword: {
+        type: 'string',
+        example: 'oldPassword123'
+      },
+      newPassword: {
+        type: 'string',
+        example: 'newPassword123'
+      },
+      confirmPassword: {
+        type: 'string',
+        example: 'newPassword123'
+      }
+    }
+  },
+  response: {
+    type: 'object',
+    properties: {
+      status: {
+        type: 'string',
+        example: 'success'
+      },
+      message: {
+        type: 'string',
+        example: 'Password updated successfully'
+      }
+    }
+  }
+};

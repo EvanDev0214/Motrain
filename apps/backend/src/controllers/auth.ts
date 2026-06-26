@@ -4,7 +4,7 @@ import { authService } from '@/services/auth';
 import { emailVerificationService } from '@/services/emailVerification';
 import { emailVerifyOtpsRepository } from '@/repositories/emailVerifyOtps';
 import { userRepository } from '@/repositories/user';
-import type { LoginRequest } from '@/schemas/auth';
+import type { LoginRequest, UpdatePasswordRequest } from '@/schemas/auth';
 import { BadRequest400Error } from '@/utils/error';
 
 /**
@@ -257,5 +257,50 @@ export const refreshToken = async (
       accessToken: newAccessToken,
       refreshToken: newRefreshToken
     }
+  });
+};
+
+/**
+ * @openapi
+ * /api/auth/password:
+ *   patch:
+ *     tags:
+ *       - Auth
+ *     summary: Update password
+ *     description: Change the authenticated user's password by verifying the old password
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/auth/updatePasswordSchema/request'
+ *     responses:
+ *       200:
+ *         description: Password updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/auth/updatePasswordSchema/response'
+ *       400:
+ *         description: "`INVALID_PASSWORD` : Old password is incorrect"
+ *       401:
+ *         description: "`INVALID_TOKEN` : Invalid or expired access token"
+ */
+export const updatePassword = async (
+  req: Request<unknown, unknown, UpdatePasswordRequest>,
+  res: Response
+) => {
+  const { oldPassword, newPassword } = req.body;
+  await authService.updatePassword(
+    req.user!.userId,
+    oldPassword,
+    newPassword
+  );
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Password updated successfully'
   });
 };

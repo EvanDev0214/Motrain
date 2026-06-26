@@ -2,7 +2,7 @@ import argon2 from 'argon2';
 import type { RegisterInput } from '@/schemas/auth';
 import { userRepository, type UserRepository } from '@/repositories/user';
 import { refreshTokensRepository, type RefreshTokensRepository } from '@/repositories/refreshTokens';
-import { Unauthorized401Error } from '@/utils/error';
+import { BadRequest400Error, Unauthorized401Error } from '@/utils/error';
 import { generateJwt } from '@/utils/jwt';
 
 class AuthService {
@@ -98,6 +98,26 @@ class AuthService {
     await this.refreshTokensRepository.deleteByUserId(userId);
   }
 
+  async updatePassword(
+    userId: UUID,
+    oldPassword: string,
+    newPassword: string
+  ) {
+    const user = await this.userRepository.findByUserId(userId);
+
+    if (!user) {
+      throw new Unauthorized401Error('User not found', 'INVALID_TOKEN');
+    }
+
+    const isPasswordValid = await argon2.verify(user.passwordHash, oldPassword);
+
+    if (!isPasswordValid) {
+      throw new BadRequest400Error('Old password is incorrect', 'INVALID_PASSWORD');
+    }
+
+    const passwordHash = await argon2.hash(newPassword);
+    await this.userRepository.updatePasswordByUserId(userId, passwordHash);
+  }
 }
 
 export const authService = new AuthService(
