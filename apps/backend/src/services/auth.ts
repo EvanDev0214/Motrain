@@ -4,9 +4,7 @@ import { userRepository, type UserRepository } from '@/repositories/user';
 import { refreshTokensRepository, type RefreshTokensRepository } from '@/repositories/refreshTokens';
 import { BadRequest400Error, Unauthorized401Error } from '@/utils/error';
 import { generateJwt } from '@/utils/jwt';
-import { emailVerificationService } from '@/services/emailVerification';
-
-type EmailVerificationService = typeof emailVerificationService;
+import { emailVerificationService, type EmailVerificationService } from '@/services/emailVerification';
 
 class AuthService {
   constructor(

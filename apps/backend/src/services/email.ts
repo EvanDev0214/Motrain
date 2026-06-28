@@ -2,7 +2,7 @@ import { Resend } from 'resend';
 import env from '@/configs/env';
 import { logger } from '@/utils/logger';
 
-class EmailService {
+class ResendService {
   constructor(
     private resend: Resend
   ) {}
@@ -28,6 +28,39 @@ class EmailService {
   }
 }
 
-export const emailService = new EmailService(
-  new Resend(env.RESEND_API_KEY)
-);
+const resendService = new ResendService(new Resend(env.RESEND_API_KEY));
+
+export class EmailService {
+  constructor(
+    private resendService:  ResendService
+  ) {}
+  async sendRegisterOtpEmail(to: Email, otp: string) {
+    await this.resendService.send(
+      to,
+      'Motrain - Email Verification Code',
+      `
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
+        <h2 style="color: #333;">Verify Your Email</h2>
+        <p>Your verification code is:</p>
+        <p style="font-size: 32px; font-weight: bold; letter-spacing: 6px; color: #111; margin: 24px 0;">${otp}</p>
+        <p style="color: #666; font-size: 14px;">This code will expire in 5 minutes. If you did not request this, please ignore this email.</p>
+      </div>
+    `);
+  }
+
+  async sendPasswordResetOtpEmail(to: Email, otp: string) {
+    await this.resendService.send(
+      to,
+      'Motrain - Password Reset Code',
+      `
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
+        <h2 style="color: #333;">Reset Your Password</h2>
+        <p>Your password reset code is:</p>
+        <p style="font-size: 32px; font-weight: bold; letter-spacing: 6px; color: #111; margin: 24px 0;">${otp}</p>
+        <p style="color: #666; font-size: 14px;">This code will expire in 5 minutes. If you did not request this, please ignore this email.</p>
+      </div>
+    `);
+  }
+}
+
+export const emailService = new EmailService(resendService);
