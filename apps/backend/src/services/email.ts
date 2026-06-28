@@ -62,6 +62,19 @@ export class EmailService {
       </div>
     `);
   }
+
+  async sendPasswordResetConfirmationEmail(to: Email) {
+    await this.resendService.send(
+      to,
+      'Motrain - Password Reset Successful',
+      `
+      <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 24px;">
+        <h2 style="color: #333;">Password Reset Successful</h2>
+        <p>Your password has been successfully reset.</p>
+        <p style="color: #666; font-size: 14px;">If you did not make this change, please contact support immediately or reset your password again to secure your account.</p>
+      </div>
+    `);
+  }
 }
 
 export const emailService = new EmailService(
