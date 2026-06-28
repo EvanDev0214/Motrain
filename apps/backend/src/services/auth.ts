@@ -5,12 +5,14 @@ import { refreshTokensRepository, type RefreshTokensRepository } from '@/reposit
 import { BadRequest400Error, Unauthorized401Error } from '@/utils/error';
 import { generateJwt } from '@/utils/jwt';
 import { emailVerificationService, type EmailVerificationService } from '@/services/emailVerification';
+import { emailService, type EmailService } from '@/services/email';
 
 class AuthService {
   constructor(
     private userRepository: UserRepository,
     private refreshTokensRepository: RefreshTokensRepository,
-    private emailVerificationService: EmailVerificationService
+    private emailVerificationService: EmailVerificationService,
+    private emailService: EmailService
   ) {}
 
   async register(data: RegisterInput) {
@@ -149,6 +151,8 @@ class AuthService {
     await this.userRepository.updatePasswordByUserId(userId, passwordHash);
 
     await this.refreshTokensRepository.deleteByUserId(userId);
+
+    await this.emailService.sendPasswordResetConfirmationEmail(user.email);
   }
 
   async forgotPassword(email: Email) {
@@ -163,5 +167,6 @@ class AuthService {
 export const authService = new AuthService(
   userRepository,
   refreshTokensRepository,
-  emailVerificationService
+  emailVerificationService,
+  emailService
 );
