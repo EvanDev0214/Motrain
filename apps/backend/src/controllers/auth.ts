@@ -1,11 +1,14 @@
 import type { Request, Response } from 'express';
-import env from '@/configs/env';
 import { authService } from '@/services/auth';
 import { emailVerificationService } from '@/services/emailVerification';
-import { emailVerifyOtpsRepository } from '@/repositories/emailVerifyOtps';
 import { userRepository } from '@/repositories/user';
-import type { LoginRequest } from '@/schemas/auth';
-import { BadRequest400Error } from '@/utils/error';
+import type {
+  LoginRequest,
+  UpdatePasswordRequest,
+  ForgotPasswordRequest,
+  VerifyPasswordOtpRequest,
+  ResetPasswordRequest
+} from '@/schemas/auth';
 
 /**
  * @openapi
@@ -88,19 +91,7 @@ export const verifyEmailOTP = async (
 ) => {
   const { email, otp } = req.body;
 
-  const data = await emailVerifyOtpsRepository.findByEmail(email);
-
-  if (!data || data.expiresAt < new Date() || data.attempts >= env.MAX_OTP_ATTEMPTS) {
-    throw new BadRequest400Error('OTP has expired or exceeded maximum attempts', 'OTP_INVALID');
-  }
-
-  if (data.code !== otp) {
-    await emailVerifyOtpsRepository.incrementAttempts(data.userId);
-    throw new BadRequest400Error('OTP validation failed', 'OTP_MISMATCH');
-  }
-
-  await userRepository.markEmailAsVerified(data.userId);
-  await emailVerifyOtpsRepository.deleteByUserId(data.userId);
+  await authService.verifyEmailOTP(email, otp);
 
   res.status(200).json({
     status: 'success',
@@ -257,5 +248,166 @@ export const refreshToken = async (
       accessToken: newAccessToken,
       refreshToken: newRefreshToken
     }
+  });
+};
+
+/**
+ * @openapi
+ * /api/auth/password:
+ *   patch:
+ *     tags:
+ *       - Auth
+ *     summary: Update password
+ *     description: Change the authenticated user's password by verifying the old password
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/auth/updatePasswordSchema/request'
+ *     responses:
+ *       200:
+ *         description: Password updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/auth/updatePasswordSchema/response'
+ *       400:
+ *         description: "`INVALID_PASSWORD` : Old password is incorrect"
+ *       401:
+ *         description: "`INVALID_TOKEN` : Invalid or expired access token"
+ */
+export const updatePassword = async (
+  req: Request<unknown, unknown, UpdatePasswordRequest>,
+  res: Response
+) => {
+  const { oldPassword, newPassword } = req.body;
+  await authService.updatePassword(
+    req.user!.userId,
+    oldPassword,
+    newPassword
+  );
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Password updated successfully'
+  });
+};
+
+/**
+ * @openapi
+ * /api/auth/password/forgot:
+ *   post:
+ *     tags:
+ *       - Auth
+ *     summary: Request a password reset code
+ *     description: Send a password reset OTP to the user's email. Always returns success to prevent email enumeration.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/auth/forgotPasswordSchema/request'
+ *     responses:
+ *       200:
+ *         description: Password reset code sent (always returns success to prevent email enumeration)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/auth/forgotPasswordSchema/response'
+ */
+export const forgotPassword = async (
+  req: Request<unknown, unknown, ForgotPasswordRequest>,
+  res: Response
+) => {
+  const { email } = req.body;
+  await authService.forgotPassword(email);
+
+  res.status(200).json({
+    status: 'success',
+    message: 'If this email is registered, a password reset code has been sent'
+  });
+};
+
+/**
+ * @openapi
+ * /api/auth/password/verify:
+ *   post:
+ *     tags:
+ *       - Auth
+ *     summary: Verify password reset OTP
+ *     description: Verify the OTP sent for password reset and return a short-lived reset token
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/auth/verifyPasswordOtpSchema/request'
+ *     responses:
+ *       200:
+ *         description: OTP verified, reset token issued
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/auth/verifyPasswordOtpSchema/response'
+ *       400:
+ *         description: |
+ *           - `OTP_INVALID` : OTP has expired or exceeded maximum attempts
+ *           - `OTP_MISMATCH` : OTP validation failed
+ */
+export const verifyPasswordOTP = async (
+  req: Request<unknown, unknown, VerifyPasswordOtpRequest>,
+  res: Response
+) => {
+  const { email, otp } = req.body;
+  const { resetToken } = await authService.verifyPasswordOTP(email, otp);
+
+  res.status(200).json({
+    status: 'success',
+    message: 'OTP verified successfully',
+    data: {
+      resetToken
+    }
+  });
+};
+
+/**
+ * @openapi
+ * /api/auth/password/reset:
+ *   post:
+ *     tags:
+ *       - Auth
+ *     summary: Reset password
+ *     description: Reset the user's password using a short-lived reset token obtained from OTP verification. Revokes all refresh tokens to force re-login on all devices.
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/auth/resetPasswordSchema/request'
+ *     responses:
+ *       200:
+ *         description: Password reset successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/auth/resetPasswordSchema/response'
+ *       401:
+ *         description: "`INVALID_TOKEN` : Invalid or expired reset token"
+ */
+export const resetPassword = async (
+  req: Request<unknown, unknown, ResetPasswordRequest>,
+  res: Response
+) => {
+  const { newPassword } = req.body;
+  await authService.resetPassword(req.user!.userId, newPassword);
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Password reset successfully'
   });
 };

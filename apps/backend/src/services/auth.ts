@@ -2,13 +2,15 @@ import argon2 from 'argon2';
 import type { RegisterInput } from '@/schemas/auth';
 import { userRepository, type UserRepository } from '@/repositories/user';
 import { refreshTokensRepository, type RefreshTokensRepository } from '@/repositories/refreshTokens';
-import { Unauthorized401Error } from '@/utils/error';
+import { BadRequest400Error, Unauthorized401Error } from '@/utils/error';
 import { generateJwt } from '@/utils/jwt';
+import { emailVerificationService, type EmailVerificationService } from '@/services/emailVerification';
 
 class AuthService {
   constructor(
     private userRepository: UserRepository,
-    private refreshTokensRepository: RefreshTokensRepository
+    private refreshTokensRepository: RefreshTokensRepository,
+    private emailVerificationService: EmailVerificationService
   ) {}
 
   async register(data: RegisterInput) {
@@ -23,10 +25,7 @@ class AuthService {
     return newUser;
   }
 
-  async login(
-    email: Email,
-    password: string
-  ) {
+  async login(email: Email, password: string) {
     const user = await this.userRepository.findByEmail(email);
 
     if (!user || !user.emailVerifiedAt) {
@@ -51,10 +50,7 @@ class AuthService {
     };
   }
 
-  async refreshToken(
-    token: string,
-    payload: UserJwtPayload
-  ) {
+  async refreshToken(token: string, payload: UserJwtPayload) {
     const storedToken = await this.refreshTokensRepository.findByUserId(payload.userId);
 
     if (!storedToken) {
@@ -98,9 +94,74 @@ class AuthService {
     await this.refreshTokensRepository.deleteByUserId(userId);
   }
 
+  async updatePassword(
+    userId: UUID,
+    oldPassword: string,
+    newPassword: string
+  ) {
+    const user = await this.userRepository.findByUserId(userId);
+
+    if (!user) {
+      throw new Unauthorized401Error('User not found', 'INVALID_TOKEN');
+    }
+
+    const isPasswordValid = await argon2.verify(user.passwordHash, oldPassword);
+
+    if (!isPasswordValid) {
+      throw new BadRequest400Error('Old password is incorrect', 'INVALID_PASSWORD');
+    }
+
+    const passwordHash = await argon2.hash(newPassword);
+    await this.userRepository.updatePasswordByUserId(userId, passwordHash);
+  }
+
+  async verifyEmailOTP(email: Email, otp: string) {
+    const { userId } = await this.emailVerificationService.verifyOTP(email, otp);
+    await this.userRepository.markEmailAsVerified(userId);
+  }
+
+  async verifyPasswordOTP(email: Email, otp: string) {
+    const { userId } = await this.emailVerificationService.verifyOTP(email, otp);
+
+    const user = await this.userRepository.findByUserId(userId);
+
+    if (!user) {
+      throw new Unauthorized401Error('User not found', 'INVALID_TOKEN');
+    }
+
+    if (!user.emailVerifiedAt) {
+      await this.userRepository.markEmailAsVerified(userId);
+    }
+
+    const resetToken = generateJwt('PASSWORD_RESET', { email: user.email, userId: user.id });
+
+    return { resetToken };
+  }
+
+  async resetPassword(userId: UUID, newPassword: string) {
+    const user = await this.userRepository.findByUserId(userId);
+
+    if (!user) {
+      throw new Unauthorized401Error('User not found', 'INVALID_TOKEN');
+    }
+
+    const passwordHash = await argon2.hash(newPassword);
+    await this.userRepository.updatePasswordByUserId(userId, passwordHash);
+
+    await this.refreshTokensRepository.deleteByUserId(userId);
+  }
+
+  async forgotPassword(email: Email) {
+    const user = await this.userRepository.findByEmail(email);
+
+    if (!user) return;
+
+    await this.emailVerificationService.sendOTP(user.id, user.email, 'password_reset');
+  }
 }
 
 export const authService = new AuthService(
   userRepository,
-  refreshTokensRepository
+  refreshTokensRepository,
+  emailVerificationService
 );

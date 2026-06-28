@@ -199,3 +199,120 @@ export const refreshTokenSchema: SwaggerSchema = {
     }
   }
 };
+
+export const updatePasswordSchema: SwaggerSchema = {
+  request: {
+    type: 'object',
+    required: ['oldPassword', 'newPassword', 'confirmPassword'],
+    properties: {
+      oldPassword: {
+        type: 'string',
+        example: 'oldPassword123'
+      },
+      newPassword: {
+        type: 'string',
+        example: 'newPassword123'
+      },
+      confirmPassword: {
+        type: 'string',
+        example: 'newPassword123'
+      }
+    }
+  },
+  response: {
+    type: 'object',
+    properties: {
+      status: {
+        type: 'string',
+        example: 'success'
+      },
+      message: {
+        type: 'string',
+        example: 'Password updated successfully'
+      }
+    }
+  }
+};
+
+export const verifyPasswordOtpSchema: SwaggerSchema = {
+  request: verifyEmailOtpSchema.request,
+  response: {
+    type: 'object',
+    properties: {
+      status: {
+        type: 'string',
+        example: 'success'
+      },
+      message: {
+        type: 'string',
+        example: 'OTP verified successfully'
+      },
+      data: {
+        type: 'object',
+        properties: {
+          resetToken: {
+            type: 'string',
+            example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+          }
+        }
+      }
+    }
+  }
+};
+
+export const resetPasswordSchema: SwaggerSchema = {
+  request: {
+    type: 'object',
+    required: ['newPassword', 'confirmPassword'],
+    properties: {
+      newPassword: {
+        type: 'string',
+        example: 'newPassword123'
+      },
+      confirmPassword: {
+        type: 'string',
+        example: 'newPassword123'
+      }
+    }
+  },
+  response: {
+    type: 'object',
+    properties: {
+      status: {
+        type: 'string',
+        example: 'success'
+      },
+      message: {
+        type: 'string',
+        example: 'Password reset successfully'
+      }
+    }
+  }
+};
+
+export const forgotPasswordSchema: SwaggerSchema = {
+  request: {
+    type: 'object',
+    required: ['email'],
+    properties: {
+      email: {
+        type: 'string',
+        format: 'email',
+        example: 'user@example.com'
+      }
+    }
+  },
+  response: {
+    type: 'object',
+    properties: {
+      status: {
+        type: 'string',
+        example: 'success'
+      },
+      message: {
+        type: 'string',
+        example: 'If this email is registered, a password reset code has been sent'
+      }
+    }
+  }
+};

@@ -22,20 +22,27 @@ export const userRepository = {
 
     return newUser!;
   },
-  markEmailAsVerified: async (
-    userId: UUID
-  ) => {
+  markEmailAsVerified: async (userId: UUID) => {
     await db.update(users).set({
       emailVerifiedAt: new Date()
     }).where(eq(users.id, userId));
   },
-  findByEmail: async (
-    email: Email
-  ) => {
+  findByEmail: async (email: Email) => {
     const result = await db.select().from(users)
       .where(eq(users.email, email));
 
     return result[0];
+  },
+  findByUserId: async (userId: UUID) => {
+    const result = await db.select().from(users)
+      .where(eq(users.id, userId));
+
+    return result[0];
+  },
+  updatePasswordByUserId: async (userId: UUID, passwordHash: string) => {
+    await db.update(users)
+      .set({ passwordHash })
+      .where(eq(users.id, userId));
   }
 };
 

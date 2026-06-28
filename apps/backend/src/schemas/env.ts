@@ -30,7 +30,9 @@ export const envSchema = z.object({
   SWAGGER_PASSWORD: z.string().optional(),
   JWT_ACCESS_SECRET_KEY: requiredEnvField(),
   JWT_REFRESH_SECRET_KEY: requiredEnvField(),
+  JWT_PASSWORD_RESET_SECRET_KEY: requiredEnvField(),
   JWT_ACCESS_EXPIRES_IN: msDurationField(),
   JWT_REFRESH_EXPIRES_IN: msDurationField(),
+  JWT_PASSWORD_RESET_EXPIRES_IN: msDurationField(),
   JWT_ISS: requiredEnvField()
 });

@@ -50,5 +50,44 @@ export const loginSchema = z.object({
   })
 });
 
+export const updatePasswordSchema = z.object({
+  body: z.object({
+    oldPassword: z.string().min(1, '舊密碼不可為空'),
+    newPassword: z.string().min(8, '新密碼長度至少為 8 個字元').max(30, '新密碼長度不可超過 30 個字元').regex(
+      ALPHANUMERIC_ONLY.pattern,
+      ALPHANUMERIC_ONLY.message
+    ),
+    confirmPassword: z.string().min(1, '確認密碼不可為空')
+  }).refine(data => data.newPassword === data.confirmPassword, {
+    message: '確認密碼與新密碼不一致',
+    path: ['confirmPassword']
+  })
+});
+
+export const forgotPasswordSchema = z.object({
+  body: z.object({
+    email: emailField
+  })
+});
+
+export const verifyPasswordOtpSchema = verifyEmailOtpSchema;
+
+export const resetPasswordSchema = z.object({
+  body: z.object({
+    newPassword: z.string().min(8, '新密碼長度至少為 8 個字元').max(30, '新密碼長度不可超過 30 個字元').regex(
+      ALPHANUMERIC_ONLY.pattern,
+      ALPHANUMERIC_ONLY.message
+    ),
+    confirmPassword: z.string().min(1, '確認密碼不可為空')
+  }).refine(data => data.newPassword === data.confirmPassword, {
+    message: '確認密碼與新密碼不一致',
+    path: ['confirmPassword']
+  })
+});
+
 export type RegisterInput = Omit<z.infer<typeof registerSchema>['body'], 'confirmPassword'>;
 export type LoginRequest = z.infer<typeof loginSchema>['body'];
+export type UpdatePasswordRequest = z.infer<typeof updatePasswordSchema>['body'];
+export type ForgotPasswordRequest = z.infer<typeof forgotPasswordSchema>['body'];
+export type VerifyPasswordOtpRequest = z.infer<typeof verifyPasswordOtpSchema>['body'];
+export type ResetPasswordRequest = z.infer<typeof resetPasswordSchema>['body'];
