@@ -51,7 +51,7 @@ export const validateMiddleware = (schema: z.ZodType<RequestSchema>) => (
   }
 };
 
-export const authMiddleware = (type: 'ACCESS' | 'REFRESH') => (
+export const authMiddleware = (type: 'ACCESS' | 'REFRESH' | 'PASSWORD_RESET') => (
   req: Request,
   _res: Response,
   next: NextFunction

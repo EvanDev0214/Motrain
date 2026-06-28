@@ -260,6 +260,36 @@ export const verifyPasswordOtpSchema: SwaggerSchema = {
   }
 };
 
+export const resetPasswordSchema: SwaggerSchema = {
+  request: {
+    type: 'object',
+    required: ['newPassword', 'confirmPassword'],
+    properties: {
+      newPassword: {
+        type: 'string',
+        example: 'newPassword123'
+      },
+      confirmPassword: {
+        type: 'string',
+        example: 'newPassword123'
+      }
+    }
+  },
+  response: {
+    type: 'object',
+    properties: {
+      status: {
+        type: 'string',
+        example: 'success'
+      },
+      message: {
+        type: 'string',
+        example: 'Password reset successfully'
+      }
+    }
+  }
+};
+
 export const forgotPasswordSchema: SwaggerSchema = {
   request: {
     type: 'object',

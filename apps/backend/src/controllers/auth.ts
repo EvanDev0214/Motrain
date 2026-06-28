@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import { authService } from '@/services/auth';
 import { emailVerificationService } from '@/services/emailVerification';
 import { userRepository } from '@/repositories/user';
-import type { LoginRequest, UpdatePasswordRequest, ForgotPasswordRequest, VerifyPasswordOtpRequest } from '@/schemas/auth';
+import type { LoginRequest, UpdatePasswordRequest, ForgotPasswordRequest, VerifyPasswordOtpRequest, ResetPasswordRequest } from '@/schemas/auth';
 
 /**
  * @openapi
@@ -364,5 +364,44 @@ export const verifyPasswordOTP = async (
     data: {
       resetToken
     }
+  });
+};
+
+/**
+ * @openapi
+ * /api/auth/password/reset:
+ *   post:
+ *     tags:
+ *       - Auth
+ *     summary: Reset password
+ *     description: Reset the user's password using a short-lived reset token obtained from OTP verification. Revokes all refresh tokens to force re-login on all devices.
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/auth/resetPasswordSchema/request'
+ *     responses:
+ *       200:
+ *         description: Password reset successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/auth/resetPasswordSchema/response'
+ *       401:
+ *         description: "`INVALID_TOKEN` : Invalid or expired reset token"
+ */
+export const resetPassword = async (
+  req: Request<unknown, unknown, ResetPasswordRequest>,
+  res: Response
+) => {
+  const { newPassword } = req.body;
+  await authService.resetPassword(req.user!.userId, newPassword);
+
+  res.status(200).json({
+    status: 'success',
+    message: 'Password reset successfully'
   });
 };

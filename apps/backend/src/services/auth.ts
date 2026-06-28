@@ -146,6 +146,19 @@ class AuthService {
     return { resetToken };
   }
 
+  async resetPassword(userId: UUID, newPassword: string) {
+    const user = await this.userRepository.findByUserId(userId);
+
+    if (!user) {
+      throw new Unauthorized401Error('User not found', 'INVALID_TOKEN');
+    }
+
+    const passwordHash = await argon2.hash(newPassword);
+    await this.userRepository.updatePasswordByUserId(userId, passwordHash);
+
+    await this.refreshTokensRepository.deleteByUserId(userId);
+  }
+
   async forgotPassword(email: Email) {
     const user = await this.userRepository.findByEmail(email);
 
