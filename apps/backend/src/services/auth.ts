@@ -27,10 +27,7 @@ class AuthService {
     return newUser;
   }
 
-  async login(
-    email: Email,
-    password: string
-  ) {
+  async login(email: Email, password: string) {
     const user = await this.userRepository.findByEmail(email);
 
     if (!user || !user.emailVerifiedAt) {
@@ -55,10 +52,7 @@ class AuthService {
     };
   }
 
-  async refreshToken(
-    token: string,
-    payload: UserJwtPayload
-  ) {
+  async refreshToken(token: string, payload: UserJwtPayload) {
     const storedToken = await this.refreshTokensRepository.findByUserId(payload.userId);
 
     if (!storedToken) {

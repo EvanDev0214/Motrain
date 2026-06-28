@@ -2,7 +2,13 @@ import type { Request, Response } from 'express';
 import { authService } from '@/services/auth';
 import { emailVerificationService } from '@/services/emailVerification';
 import { userRepository } from '@/repositories/user';
-import type { LoginRequest, UpdatePasswordRequest, ForgotPasswordRequest, VerifyPasswordOtpRequest, ResetPasswordRequest } from '@/schemas/auth';
+import type {
+  LoginRequest,
+  UpdatePasswordRequest,
+  ForgotPasswordRequest,
+  VerifyPasswordOtpRequest,
+  ResetPasswordRequest
+} from '@/schemas/auth';
 
 /**
  * @openapi

@@ -1,7 +1,27 @@
 import { Router } from 'express';
 import { validateMiddleware, authMiddleware } from '@/middlewares/validate';
-import { loginSchema, registerSchema, resendEmailOtpSchema, verifyEmailOtpSchema, updatePasswordSchema, forgotPasswordSchema, verifyPasswordOtpSchema, resetPasswordSchema } from '@/schemas/auth';
-import { register, resendEmailOTP, verifyEmailOTP, login, logout, refreshToken, updatePassword, forgotPassword, verifyPasswordOTP, resetPassword } from '@/controllers/auth';
+import {
+  loginSchema,
+  registerSchema,
+  resendEmailOtpSchema,
+  verifyEmailOtpSchema,
+  updatePasswordSchema,
+  forgotPasswordSchema,
+  verifyPasswordOtpSchema,
+  resetPasswordSchema
+} from '@/schemas/auth';
+import {
+  register,
+  resendEmailOTP,
+  verifyEmailOTP,
+  login,
+  logout,
+  refreshToken,
+  updatePassword,
+  forgotPassword,
+  verifyPasswordOTP,
+  resetPassword
+} from '@/controllers/auth';
 
 const authRouter = Router();
 

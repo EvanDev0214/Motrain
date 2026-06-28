@@ -5,10 +5,7 @@ import { refreshTokens } from '@/db/schemas/refreshTokens';
 import env from '@/configs/env';
 
 export const refreshTokensRepository = {
-  upsert: async (
-    userId: UUID,
-    refreshTokenHash: string
-  ) => {
+  upsert: async (userId: UUID, refreshTokenHash: string) => {
     const expiresMs = ms(env.JWT_REFRESH_EXPIRES_IN as StringValue);
     const now = new Date();
     const expiresAt = new Date(now.getTime() + expiresMs);

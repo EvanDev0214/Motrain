@@ -27,24 +27,18 @@ export const emailVerifyOtpsRepository = {
       }
     });
   },
-  findByEmail: async (
-    email: Email
-  ) => {
+  findByEmail: async (email: Email) => {
     const [data] = await db.select().from(emailVerifyOtps)
       .where(eq(emailVerifyOtps.email, email));
 
     return data;
   },
-  incrementAttempts: async (
-    userId: UUID
-  ) => {
+  incrementAttempts: async (userId: UUID) => {
     await db.update(emailVerifyOtps)
       .set({ attempts: sql`${emailVerifyOtps.attempts} + 1` })
       .where(eq(emailVerifyOtps.userId, userId));
   },
-  deleteByUserId: async (
-    userId: UUID
-  ) => {
+  deleteByUserId: async (userId: UUID) => {
     await db.delete(emailVerifyOtps)
       .where(eq(emailVerifyOtps.userId, userId));
   }
