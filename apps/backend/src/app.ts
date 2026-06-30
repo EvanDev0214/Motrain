@@ -11,6 +11,7 @@ import {
 } from '@/middlewares/errorHandler';
 import swaggerMiddleware from '@/middlewares/swagger';
 import authRouter from '@/routes/auth';
+import exercisesRouter from '@/routes/exercise';
 import { logger } from '@/utils/logger';
 
 const app = express();
@@ -37,6 +38,7 @@ app.get('/ready', async (_req, res) => {
 });
 
 app.use('/api/auth', authRouter);
+app.use('/api/exercises', exercisesRouter);
 
 app.use(routerErrorHandler);
 app.use(errorHandler);
