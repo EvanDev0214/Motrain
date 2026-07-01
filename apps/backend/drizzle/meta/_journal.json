@@ -29,6 +29,13 @@
       "when": 1782795491717,
       "tag": "20260630045811_create_exercises_table",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1782892098102,
+      "tag": "20260701074818_create_muscles_table",
+      "breakpoints": true
     }
   ]
 }
