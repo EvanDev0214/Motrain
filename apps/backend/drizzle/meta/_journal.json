@@ -43,6 +43,13 @@
       "when": 1782892859888,
       "tag": "20260701080059_create_exercise_muscles_table",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1782893810691,
+      "tag": "20260701081650_add_unique_constraint_to_muscles_name",
+      "breakpoints": true
     }
   ]
 }
