@@ -1,6 +1,11 @@
 import type { Request, Response } from 'express';
 import { exerciseService } from '@/services/exercise';
-import type { CreateUserExerciseRequest, GetExerciseParams } from '@/schemas/exercise';
+import type {
+  CreateUserExerciseRequest,
+  GetExerciseParams,
+  ReplaceExerciseBody,
+  ReplaceExerciseParams
+} from '@/schemas/exercise';
 
 /**
  * @openapi
@@ -110,6 +115,57 @@ export const getExercise = async (
   const { exerciseId } = req.params;
   const { userId } = req.user!;
   const exercise = await exerciseService.getExerciseById(userId, exerciseId);
+
+  res.status(200).json({
+    status: 'success',
+    data: exercise
+  });
+};
+
+/**
+ * @openapi
+ * /api/exercises/{exerciseId}:
+ *   put:
+ *     tags:
+ *       - Exercises
+ *     summary: Replace a user exercise
+ *     description: Replace all fields of a user-created exercise. System exercises cannot be modified.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: exerciseId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: The exercise UUID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/exercises/replaceExerciseSchema/request'
+ *     responses:
+ *       200:
+ *         description: Exercise replaced successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/exercises/replaceExerciseSchema/response'
+ *       401:
+ *         description: "`INVALID_TOKEN` : Invalid or expired access token"
+ *       403:
+ *         description: "`EXERCISE_SYSTEM_IMMUTABLE` : System exercises cannot be modified"
+ *       404:
+ *         description: "`EXERCISE_NOT_FOUND` : The exercise does not exist or has been deleted"
+ */
+export const replaceExercise = async (
+  req: Request<ReplaceExerciseParams, unknown, ReplaceExerciseBody>,
+  res: Response
+) => {
+  const { user, params, body } = req;
+  const exercise = await exerciseService.replaceExerciseById(user!.userId, params.exerciseId, body);
 
   res.status(200).json({
     status: 'success',
