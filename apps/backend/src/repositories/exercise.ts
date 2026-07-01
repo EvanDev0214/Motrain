@@ -16,6 +16,14 @@ export const exerciseRepository = {
   create: async (data: CreateExerciseData) => {
     const [exercise] = await db.insert(exercises).values(data).returning();
     return exercise;
+  },
+
+  findById: async (exerciseId: UUID) => {
+    const [exercise] = await db.select().from(exercises)
+      .where(eq(exercises.id, exerciseId))
+      .limit(1);
+
+    return exercise ?? null;
   }
 };
 

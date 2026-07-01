@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { exerciseService } from '@/services/exercise';
-import type { CreateUserExerciseRequest } from '@/schemas/exercise';
+import type { CreateUserExerciseRequest, GetExerciseParams } from '@/schemas/exercise';
 
 /**
  * @openapi
@@ -68,6 +68,50 @@ export const createUserExercise = async (
   const exercise = await exerciseService.createUserExercise(user!.userId, body);
 
   res.status(201).json({
+    status: 'success',
+    data: exercise
+  });
+};
+
+/**
+ * @openapi
+ * /api/exercises/{exerciseId}:
+ *   get:
+ *     tags:
+ *       - Exercises
+ *     summary: Get exercise by ID
+ *     description: Retrieve a specific exercise by its ID. Users can access system exercises and their own custom exercises.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: exerciseId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: The exercise UUID
+ *     responses:
+ *       200:
+ *         description: Exercise retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/exercises/getExerciseSchema/response'
+ *       401:
+ *         description: "`INVALID_TOKEN` : Invalid or expired access token"
+ *       404:
+ *         description: "`EXERCISE_NOT_FOUND` : The exercise does not exist or has been deleted"
+ */
+export const getExercise = async (
+  req: Request<GetExerciseParams>,
+  res: Response
+) => {
+  const { exerciseId } = req.params;
+  const { userId } = req.user!;
+  const exercise = await exerciseService.getExerciseById(userId, exerciseId);
+
+  res.status(200).json({
     status: 'success',
     data: exercise
   });

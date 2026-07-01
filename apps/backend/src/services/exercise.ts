@@ -1,5 +1,6 @@
 import { exerciseRepository, type ExerciseRepo } from '@/repositories/exercise';
 import type { CreateUserExerciseRequest } from '@/schemas/exercise';
+import { NotFound404Error } from '@/utils/error';
 
 export class ExerciseService {
   constructor(
@@ -19,6 +20,20 @@ export class ExerciseService {
       mediaUrl: data.mediaUrl,
       isSystem: false
     });
+  }
+
+  async getExerciseById(userId: UUID, exerciseId: UUID) {
+    const exercise = await this.exerciseRepository.findById(exerciseId);
+
+    if (!exercise) {
+      throw new NotFound404Error('The exercise does not exist or has been deleted.', 'EXERCISE_NOT_FOUND');
+    }
+
+    if (!exercise.isSystem && exercise.userId !== userId) {
+      throw new NotFound404Error('The exercise does not exist or has been deleted.', 'EXERCISE_NOT_FOUND');
+    }
+
+    return exercise;
   }
 }
 

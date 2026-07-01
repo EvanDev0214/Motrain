@@ -10,4 +10,11 @@ export const createUserExerciseSchema = z.object({
   })
 });
 
+export const getExerciseSchema = z.object({
+  params: z.object({
+    exerciseId: z.uuid('請提供有效的 UUID')
+  })
+});
+
 export type CreateUserExerciseRequest = z.infer<typeof createUserExerciseSchema>['body'];
+export type GetExerciseParams = z.infer<typeof getExerciseSchema>['params'];
