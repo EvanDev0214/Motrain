@@ -7,6 +7,24 @@ export class ExerciseService {
     private exerciseRepository: ExerciseRepo
   ) {}
 
+  private async findUserExerciseOrThrow(userId: UUID, exerciseId: UUID) {
+    const exercise = await this.exerciseRepository.findById(exerciseId);
+
+    if (!exercise) {
+      throw new NotFound404Error('The exercise does not exist or has been deleted.', 'EXERCISE_NOT_FOUND');
+    }
+
+    if (exercise.isSystem) {
+      throw new Forbidden403Error('System exercises cannot be modified.', 'EXERCISE_SYSTEM_IMMUTABLE');
+    }
+
+    if (exercise.userId !== userId) {
+      throw new NotFound404Error('The exercise does not exist or has been deleted.', 'EXERCISE_NOT_FOUND');
+    }
+
+    return exercise;
+  }
+
   async getExercises(userId: UUID) {
     return await this.exerciseRepository.findAvailableForUser(userId);
   }
@@ -41,19 +59,7 @@ export class ExerciseService {
     exerciseId: UUID,
     data: ReplaceExerciseBody
   ) {
-    const exercise = await this.exerciseRepository.findById(exerciseId);
-
-    if (!exercise) {
-      throw new NotFound404Error('The exercise does not exist or has been deleted.', 'EXERCISE_NOT_FOUND');
-    }
-
-    if (exercise.isSystem) {
-      throw new Forbidden403Error('System exercises cannot be modified.', 'EXERCISE_SYSTEM_IMMUTABLE');
-    }
-
-    if (exercise.userId !== userId) {
-      throw new NotFound404Error('The exercise does not exist or has been deleted.', 'EXERCISE_NOT_FOUND');
-    }
+    await this.findUserExerciseOrThrow(userId, exerciseId);
 
     const updated = await this.exerciseRepository.replaceById(exerciseId, data);
 
@@ -65,19 +71,7 @@ export class ExerciseService {
   }
 
   async deleteExerciseById(userId: UUID, exerciseId: UUID) {
-    const exercise = await this.exerciseRepository.findById(exerciseId);
-
-    if (!exercise) {
-      throw new NotFound404Error('The exercise does not exist or has been deleted.', 'EXERCISE_NOT_FOUND');
-    }
-
-    if (exercise.isSystem) {
-      throw new Forbidden403Error('System exercises cannot be modified.', 'EXERCISE_SYSTEM_IMMUTABLE');
-    }
-
-    if (exercise.userId !== userId) {
-      throw new NotFound404Error('The exercise does not exist or has been deleted.', 'EXERCISE_NOT_FOUND');
-    }
+    await this.findUserExerciseOrThrow(userId, exerciseId);
 
     const deleted = await this.exerciseRepository.deleteById(exerciseId);
 
