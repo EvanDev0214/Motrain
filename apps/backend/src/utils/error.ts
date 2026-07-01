@@ -28,8 +28,8 @@ export class Forbidden403Error extends AppError {
 }
 
 export class NotFound404Error extends AppError {
-  constructor(message = 'Resource not found') {
-    super(404, 'NOT_FOUND', message);
+  constructor(message = 'Resource not found', code = 'NOT_FOUND') {
+    super(404, code, message);
   }
 }
 
