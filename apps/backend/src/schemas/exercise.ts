@@ -23,7 +23,10 @@ export const replaceExerciseSchema = z.object({
   body: createUserExerciseSchema.shape.body
 });
 
+export const deleteExerciseSchema = getExerciseSchema;
+
 export type CreateUserExerciseRequest = z.infer<typeof createUserExerciseSchema>['body'];
 export type GetExerciseParams = z.infer<typeof getExerciseSchema>['params'];
 export type ReplaceExerciseBody = z.infer<typeof replaceExerciseSchema>['body'];
 export type ReplaceExerciseParams = z.infer<typeof replaceExerciseSchema>['params'];
+export type DeleteExerciseParams = z.infer<typeof deleteExerciseSchema>['params'];

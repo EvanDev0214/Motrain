@@ -4,7 +4,8 @@ import type {
   CreateUserExerciseRequest,
   GetExerciseParams,
   ReplaceExerciseBody,
-  ReplaceExerciseParams
+  ReplaceExerciseParams,
+  DeleteExerciseParams
 } from '@/schemas/exercise';
 
 /**
@@ -171,4 +172,42 @@ export const replaceExercise = async (
     status: 'success',
     data: exercise
   });
+};
+
+/**
+ * @openapi
+ * /api/exercises/{exerciseId}:
+ *   delete:
+ *     tags:
+ *       - Exercises
+ *     summary: Delete a user exercise
+ *     description: Delete a user-created exercise. System exercises cannot be deleted.
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: exerciseId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: The exercise UUID
+ *     responses:
+ *       204:
+ *         description: Exercise deleted successfully
+ *       401:
+ *         description: "`INVALID_TOKEN` : Invalid or expired access token"
+ *       403:
+ *         description: "`EXERCISE_SYSTEM_IMMUTABLE` : System exercises cannot be modified"
+ *       404:
+ *         description: "`EXERCISE_NOT_FOUND` : The exercise does not exist or has been deleted"
+ */
+export const deleteExercise = async (
+  req: Request<DeleteExerciseParams>,
+  res: Response
+) => {
+  const { user, params } = req;
+  await exerciseService.deleteExerciseById(user!.userId, params.exerciseId);
+
+  res.status(204).send();
 };

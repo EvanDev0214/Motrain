@@ -63,6 +63,30 @@ export class ExerciseService {
 
     return updated;
   }
+
+  async deleteExerciseById(userId: UUID, exerciseId: UUID) {
+    const exercise = await this.exerciseRepository.findById(exerciseId);
+
+    if (!exercise) {
+      throw new NotFound404Error('The exercise does not exist or has been deleted.', 'EXERCISE_NOT_FOUND');
+    }
+
+    if (exercise.isSystem) {
+      throw new Forbidden403Error('System exercises cannot be modified.', 'EXERCISE_SYSTEM_IMMUTABLE');
+    }
+
+    if (exercise.userId !== userId) {
+      throw new NotFound404Error('The exercise does not exist or has been deleted.', 'EXERCISE_NOT_FOUND');
+    }
+
+    const deleted = await this.exerciseRepository.deleteById(exerciseId);
+
+    if (!deleted) {
+      throw new NotFound404Error('The exercise does not exist or has been deleted.', 'EXERCISE_NOT_FOUND');
+    }
+
+    return deleted;
+  }
 }
 
 export const exerciseService = new ExerciseService(exerciseRepository);

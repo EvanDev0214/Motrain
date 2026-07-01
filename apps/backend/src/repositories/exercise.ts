@@ -33,6 +33,14 @@ export const exerciseRepository = {
       .where(eq(exercises.id, exerciseId)).returning();
 
     return exercise ?? null;
+  },
+
+  deleteById: async (exerciseId: UUID) => {
+    const [exercise] = await db.delete(exercises)
+      .where(eq(exercises.id, exerciseId))
+      .returning();
+
+    return exercise ?? null;
   }
 };
 
