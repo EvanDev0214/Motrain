@@ -36,11 +36,22 @@ export const exerciseRepository = {
   },
 
   findById: async (exerciseId: UUID) => {
-    const [exercise] = await db.select().from(exercises)
-      .where(eq(exercises.id, exerciseId))
-      .limit(1);
+    const exercise = await db.query.exercises.findFirst({
+      where: eq(exercises.id, exerciseId),
+      with: {
+        muscles: true
+      }
+    });
 
-    return exercise ?? null;
+    if (!exercise) return null;
+
+    return {
+      ...exercise,
+      muscles: exercise.muscles.map((exerciseMuscle) => ({
+        muscleId: exerciseMuscle.muscleId,
+        muscleRole: exerciseMuscle.muscleRole
+      }))
+    };
   },
 
   replaceById: async (exerciseId: UUID, data: ReplaceExerciseData) => {

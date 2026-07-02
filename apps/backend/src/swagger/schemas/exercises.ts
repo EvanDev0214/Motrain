@@ -249,7 +249,8 @@ export const getExerciseSchema: SwaggerSchema = {
             type: 'string',
             format: 'date-time',
             example: '2026-06-22T00:00:00.000Z'
-          }
+          },
+          muscles: musclesProperty
         }
       }
     }
