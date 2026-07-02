@@ -7,11 +7,23 @@ export type ReplaceExerciseData = Pick<typeof exercises.$inferInsert, 'name' | '
 
 export const exerciseRepository = {
   findAvailableForUser: async (userId: UUID) => {
-    return await db.select().from(exercises)
-      .where(or(
+    const rows = await db.query.exercises.findMany({
+      where: or(
         eq(exercises.isSystem, true),
         eq(exercises.userId, userId)
-      ));
+      ),
+      with: {
+        muscles: true
+      }
+    });
+
+    return rows.map((exercise) => ({
+      ...exercise,
+      muscles: exercise.muscles.map((exerciseMuscle) => ({
+        muscleId: exerciseMuscle.muscleId,
+        muscleRole: exerciseMuscle.muscleRole
+      }))
+    }));
   },
 
   create: async (data: CreateExerciseData, tx?: DbTransaction) => {

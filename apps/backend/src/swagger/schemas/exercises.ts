@@ -1,3 +1,22 @@
+const musclesProperty = {
+  type: 'array' as const,
+  items: {
+    type: 'object' as const,
+    properties: {
+      muscleId: {
+        type: 'string' as const,
+        format: 'uuid',
+        example: '550e8400-e29b-41d4-a716-446655440010'
+      },
+      muscleRole: {
+        type: 'string' as const,
+        enum: ['primary', 'secondary'],
+        example: 'primary'
+      }
+    }
+  }
+};
+
 export const getExercisesSchema: SwaggerSchema = {
   response: {
     type: 'object',
@@ -64,7 +83,8 @@ export const getExercisesSchema: SwaggerSchema = {
               type: 'string',
               format: 'date-time',
               example: '2026-06-22T00:00:00.000Z'
-            }
+            },
+            muscles: musclesProperty
           }
         }
       }

@@ -32,7 +32,8 @@ export const getExercises = async (
   req: Request,
   res: Response
 ) => {
-  const exercises = await exerciseService.getExercises(req.user!.userId);
+  const { user } = req;
+  const exercises = await exerciseService.getExercises(user!.userId);
 
   res.status(200).json({
     status: 'success',
