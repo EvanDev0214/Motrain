@@ -1,5 +1,5 @@
 import { eq, or } from 'drizzle-orm';
-import { db } from '@/db/db';
+import { db, type DbTransaction } from '@/db/db';
 import { exercises } from '@/db/schemas/exercises';
 
 export type CreateExerciseData = Omit<typeof exercises.$inferInsert, 'id' | 'createdAt' | 'updatedAt'>;
@@ -14,9 +14,13 @@ export const exerciseRepository = {
       ));
   },
 
-  create: async (data: CreateExerciseData) => {
-    const [exercise] = await db.insert(exercises).values(data).returning();
-    return exercise;
+  create: async (data: CreateExerciseData, tx?: DbTransaction) => {
+    const client = tx ?? db;
+    const [exercise] = await client.insert(exercises)
+      .values(data)
+      .returning();
+
+    return exercise ?? null;
   },
 
   findById: async (exerciseId: UUID) => {

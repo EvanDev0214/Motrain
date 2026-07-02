@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { exerciseService } from '@/services/exercise';
 import type {
-  CreateUserExerciseRequest,
+  CreateUserExerciseBody,
   GetExerciseParams,
   ReplaceExerciseBody,
   ReplaceExerciseParams,
@@ -67,7 +67,7 @@ export const getExercises = async (
  *         description: "`INVALID_TOKEN` : Invalid or expired access token"
  */
 export const createUserExercise = async (
-  req: Request<unknown, unknown, CreateUserExerciseRequest>,
+  req: Request<unknown, unknown, CreateUserExerciseBody>,
   res: Response
 ) => {
   const { body, user } = req;

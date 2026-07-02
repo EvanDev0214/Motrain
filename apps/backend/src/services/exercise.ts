@@ -1,10 +1,14 @@
+import { db, type DbClient } from '@/db/db';
 import { exerciseRepository, type ExerciseRepo } from '@/repositories/exercise';
-import type { CreateUserExerciseRequest, ReplaceExerciseBody } from '@/schemas/exercise';
+import { exerciseMuscleRepository, type ExerciseMuscleRepo } from '@/repositories/exerciseMuscle';
+import type { CreateUserExerciseBody, ReplaceExerciseBody } from '@/schemas/exercise';
 import { Forbidden403Error, NotFound404Error } from '@/utils/error';
 
 export class ExerciseService {
   constructor(
-    private exerciseRepository: ExerciseRepo
+    private db: DbClient,
+    private exerciseRepository: ExerciseRepo,
+    private exerciseMuscleRepository: ExerciseMuscleRepo
   ) {}
 
   private async findUserExerciseOrThrow(userId: UUID, exerciseId: UUID) {
@@ -29,14 +33,31 @@ export class ExerciseService {
     return await this.exerciseRepository.findAvailableForUser(userId);
   }
 
-  async createUserExercise(userId: UUID, data: CreateUserExerciseRequest) {
-    return await this.exerciseRepository.create({
-      userId,
-      name: data.name,
-      equipment: data.equipment,
-      defaultWeightMode: data.defaultWeightMode,
-      mediaUrl: data.mediaUrl,
-      isSystem: false
+  async createUserExercise(userId: UUID, data: CreateUserExerciseBody) {
+    return await this.db.transaction(async (tx) => {
+      const exercise = await this.exerciseRepository.create({
+        userId,
+        name: data.name,
+        equipment: data.equipment,
+        defaultWeightMode: data.defaultWeightMode,
+        mediaUrl: data.mediaUrl,
+        isSystem: false
+      }, tx);
+
+      if (!exercise) {
+        throw new Error('Failed to create exercise.');
+      }
+
+      if (data.muscles.length > 0) {
+        await this.exerciseMuscleRepository.createMany(
+          data.muscles.map(muscle => ({
+            exerciseId: exercise.id,
+            muscleId: muscle.muscleId,
+            muscleRole: muscle.muscleRole
+          })), tx);
+      }
+
+      return exercise;
     });
   }
 
@@ -83,4 +104,8 @@ export class ExerciseService {
   }
 }
 
-export const exerciseService = new ExerciseService(exerciseRepository);
+export const exerciseService = new ExerciseService(
+  db,
+  exerciseRepository,
+  exerciseMuscleRepository
+);
