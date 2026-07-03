@@ -13,6 +13,7 @@ import swaggerMiddleware from '@/middlewares/swagger';
 import authRouter from '@/routes/auth';
 import exercisesRouter from '@/routes/exercise';
 import musclesRouter from '@/routes/muscle';
+import workoutsRouter from '@/routes/workout';
 import { logger } from '@/utils/logger';
 
 const app = express();
@@ -41,6 +42,7 @@ app.get('/ready', async (_req, res) => {
 app.use('/api/auth', authRouter);
 app.use('/api/exercises', exercisesRouter);
 app.use('/api/muscles', musclesRouter);
+app.use('/api/workouts', workoutsRouter);
 
 app.use(routerErrorHandler);
 app.use(errorHandler);
