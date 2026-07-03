@@ -10,7 +10,8 @@
     "check-types": "tsc --noEmit",
     "db:generate": "read -p 'Migration name: ' name && drizzle-kit generate --name=$name",
     "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "db:seed:muscles": "tsx src/db/seeds/muscle.ts"
   },
   "author": "Evan",
   "license": "ISC",

@@ -22,6 +22,48 @@
       "when": 1782192999582,
       "tag": "20260623053639_create_refresh_tokens_table",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1782795491717,
+      "tag": "20260630045811_create_exercises_table",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1782892098102,
+      "tag": "20260701074818_create_muscles_table",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1782892859888,
+      "tag": "20260701080059_create_exercise_muscles_table",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1782893810691,
+      "tag": "20260701081650_add_unique_constraint_to_muscles_name",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1783046375603,
+      "tag": "20260703023935_change_muscle_id_on_delete_to_restrict",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1783057325589,
+      "tag": "20260703054205_rename_muscle_role_and_default_weight_mode_to_snake_case",
+      "breakpoints": true
     }
   ]
 }

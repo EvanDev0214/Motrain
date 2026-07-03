@@ -1,0 +1,1 @@
+ALTER TABLE "muscles" ADD CONSTRAINT "muscles_name_unique" UNIQUE("name");
