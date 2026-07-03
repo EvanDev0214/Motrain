@@ -5,6 +5,7 @@ import { workouts } from '@/db/schemas/workouts';
 type CreateWorkoutData = Omit<typeof workouts.$inferInsert, 'id' | 'createdAt' | 'updatedAt'>;
 
 export const workoutRepository = {
+  // TODO: 這個命名有問題
   findByUserId: async (userId: UUID) => {
     return await db.select({
       id: workouts.id,
@@ -17,6 +18,14 @@ export const workoutRepository = {
 
   create: async (data: CreateWorkoutData) => {
     const [workout] = await db.insert(workouts).values(data).returning();
+
+    return workout ?? null;
+  },
+
+  findOneById: async (workoutId: UUID) => {
+    const workout = await db.query.workouts.findFirst({
+      where: eq(workouts.id, workoutId)
+    });
 
     return workout ?? null;
   }

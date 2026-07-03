@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import type { CreateUserWorkoutBody } from '@/schemas/workout';
+import type { CreateUserWorkoutBody, GetWorkoutParams } from '@/schemas/workout';
 import { workoutService } from '@/services/workout';
 
 /**
@@ -34,7 +34,7 @@ export const getWorkouts = async (
   });
 };
 
-/**
+/**d
  * @openapi
  * /api/workouts:
  *   post:
@@ -68,6 +68,49 @@ export const createUserWorkout = async (
   const workout = await workoutService.createUserWorkout(user!.userId, body);
 
   res.status(201).json({
+    status: 'success',
+    data: workout
+  });
+};
+
+/**
+ * @openapi
+ * /api/workouts/{workoutId}:
+ *   get:
+ *     tags:
+ *       - Workouts
+ *     summary: Get workout by ID
+ *     description: Retrieve a specific workout belonging to the authenticated user
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: workoutId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: The workout UUID
+ *     responses:
+ *       200:
+ *         description: Workout retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/workouts/getWorkoutSchema/response'
+ *       401:
+ *         description: "`INVALID_TOKEN` : Invalid or expired access token"
+ *       404:
+ *         description: "`WORKOUT_NOT_FOUND` : The workout does not exist or has been deleted"
+ */
+export const getWorkout = async (
+  req: Request<GetWorkoutParams>,
+  res: Response
+) => {
+  const { user, params } = req;
+  const workout = await workoutService.getWorkoutDetails(user!.userId, params.workoutId);
+
+  res.status(200).json({
     status: 'success',
     data: workout
   });

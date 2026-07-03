@@ -7,4 +7,11 @@ export const createUserWorkoutSchema = z.object({
   })
 });
 
+export const getWorkoutSchema = z.object({
+  params: z.object({
+    workoutId: z.uuid('請提供有效的 UUID')
+  })
+});
+
 export type CreateUserWorkoutBody = z.infer<typeof createUserWorkoutSchema>['body'];
+export type GetWorkoutParams = z.infer<typeof getWorkoutSchema>['params'];
