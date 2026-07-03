@@ -1,6 +1,7 @@
 import { db, type DbClient } from '@/db/db';
 import { exerciseRepository, type ExerciseRepo } from '@/repositories/exercise';
 import { exerciseMuscleRepository, type ExerciseMuscleRepo } from '@/repositories/exerciseMuscle';
+import { muscleRepository, type MuscleRepo } from '@/repositories/muscle';
 import type { CreateUserExerciseBody, ReplaceExerciseBody } from '@/schemas/exercise';
 import { Forbidden403Error, NotFound404Error } from '@/utils/error';
 
@@ -8,7 +9,8 @@ export class ExerciseService {
   constructor(
     private db: DbClient,
     private exerciseRepository: ExerciseRepo,
-    private exerciseMuscleRepository: ExerciseMuscleRepo
+    private exerciseMuscleRepository: ExerciseMuscleRepo,
+    private muscleRepository: MuscleRepo
   ) {}
 
   private async findUserExerciseOrThrow(userId: UUID, exerciseId: UUID) {
@@ -49,6 +51,12 @@ export class ExerciseService {
       }
 
       if (data.muscles.length > 0) {
+        const existingMuscles = await this.muscleRepository.findByIds(data.muscles.map(muscle => muscle.muscleId), tx);
+
+        if (existingMuscles.length !== data.muscles.length) {
+          throw new NotFound404Error('One or more muscles do not exist.', 'MUSCLE_NOT_FOUND');
+        }
+
         await this.exerciseMuscleRepository.createMany(
           data.muscles.map(muscle => ({
             exerciseId: exercise.id,
@@ -92,6 +100,12 @@ export class ExerciseService {
       await this.exerciseMuscleRepository.deleteByExerciseId(exerciseId, tx);
 
       if (data.muscles.length > 0) {
+        const existingMuscles = await this.muscleRepository.findByIds(data.muscles.map(muscle => muscle.muscleId), tx);
+
+        if (existingMuscles.length !== data.muscles.length) {
+          throw new NotFound404Error('One or more muscles do not exist.', 'MUSCLE_NOT_FOUND');
+        }
+
         await this.exerciseMuscleRepository.createMany(
           data.muscles.map(muscle => ({
             exerciseId,
@@ -120,5 +134,6 @@ export class ExerciseService {
 export const exerciseService = new ExerciseService(
   db,
   exerciseRepository,
-  exerciseMuscleRepository
+  exerciseMuscleRepository,
+  muscleRepository
 );
