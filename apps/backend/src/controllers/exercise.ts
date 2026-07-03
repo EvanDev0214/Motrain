@@ -66,6 +66,8 @@ export const getExercises = async (
  *               $ref: '#/components/schemas/exercises/createUserExerciseSchema/response'
  *       401:
  *         description: "`INVALID_TOKEN` : Invalid or expired access token"
+ *       404:
+ *         description: "`MUSCLE_NOT_FOUND` : One or more muscles do not exist"
  */
 export const createUserExercise = async (
   req: Request<unknown, unknown, CreateUserExerciseBody>,
@@ -160,7 +162,9 @@ export const getExercise = async (
  *       403:
  *         description: "`EXERCISE_SYSTEM_IMMUTABLE` : System exercises cannot be modified"
  *       404:
- *         description: "`EXERCISE_NOT_FOUND` : The exercise does not exist or has been deleted"
+ *         description: |
+ *                    - `EXERCISE_NOT_FOUND` : The exercise does not exist or has been deleted
+ *                    - `MUSCLE_NOT_FOUND` : One or more muscles do not exist
  */
 export const replaceExercise = async (
   req: Request<ReplaceExerciseParams, unknown, ReplaceExerciseBody>,
