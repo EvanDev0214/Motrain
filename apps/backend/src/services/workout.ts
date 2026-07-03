@@ -6,6 +6,10 @@ export class WorkoutService {
     private workoutRepository: WorkoutRepo
   ) {}
 
+  async getWorkoutsByUserId(userId: UUID) {
+    return await this.workoutRepository.findByUserId(userId);
+  }
+
   async createUserWorkout(userId: UUID, data: CreateUserWorkoutBody) {
     const workout = await this.workoutRepository.create({ userId, ...data });
 

@@ -5,6 +5,38 @@ import { workoutService } from '@/services/workout';
 /**
  * @openapi
  * /api/workouts:
+ *   get:
+ *     tags:
+ *       - Workouts
+ *     summary: Get user workouts
+ *     description: Retrieve all workouts belonging to the authenticated user, ordered by most recently created
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Workouts retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/workouts/getWorkoutsSchema/response'
+ *       401:
+ *         description: "`INVALID_TOKEN` : Invalid or expired access token"
+ */
+export const getWorkouts = async (
+  req: Request,
+  res: Response
+) => {
+  const workouts = await workoutService.getWorkoutsByUserId(req.user!.userId);
+
+  res.status(200).json({
+    status: 'success',
+    data: workouts
+  });
+};
+
+/**
+ * @openapi
+ * /api/workouts:
  *   post:
  *     tags:
  *       - Workouts
