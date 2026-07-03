@@ -19,8 +19,8 @@ export const exercises = pgTable('exercises', {
   userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }),
   isSystem: boolean('is_system').notNull().default(false),
   name: varchar('name', { length: 64 }).notNull(),
-  equipment: equipmentEnum().notNull(),
-  defaultWeightMode: defaultWeightModeEnum().notNull().default('single'),
+  equipment: equipmentEnum('equipment').notNull(),
+  defaultWeightMode: defaultWeightModeEnum('default_weight_mode').notNull().default('single'),
   mediaUrl: varchar('media_url', { length: 500 }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdateFn(() => new Date())
