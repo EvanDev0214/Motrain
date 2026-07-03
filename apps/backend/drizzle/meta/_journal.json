@@ -64,6 +64,13 @@
       "when": 1783057325589,
       "tag": "20260703054205_rename_muscle_role_and_default_weight_mode_to_snake_case",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1783060221777,
+      "tag": "20260703063021_create_workouts_table",
+      "breakpoints": true
     }
   ]
 }
