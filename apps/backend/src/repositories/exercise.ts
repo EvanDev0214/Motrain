@@ -54,9 +54,19 @@ export const exerciseRepository = {
     };
   },
 
-  replaceById: async (exerciseId: UUID, data: ReplaceExerciseData) => {
-    const [exercise] = await db.update(exercises)
-      .set(data)
+  replaceById: async (
+    exerciseId: UUID,
+    data: ReplaceExerciseData,
+    tx?: DbTransaction
+  ) => {
+    const client = tx ?? db;
+    const [exercise] = await client.update(exercises)
+      .set({
+        name: data.name,
+        equipment: data.equipment,
+        defaultWeightMode: data.defaultWeightMode,
+        mediaUrl: data.mediaUrl
+      })
       .where(eq(exercises.id, exerciseId)).returning();
 
     return exercise ?? null;

@@ -260,7 +260,7 @@ export const getExerciseSchema: SwaggerSchema = {
 export const replaceExerciseSchema: SwaggerSchema = {
   request: {
     type: 'object',
-    required: ['name', 'equipment', 'defaultWeightMode', 'mediaUrl'],
+    required: ['name', 'equipment', 'defaultWeightMode', 'mediaUrl', 'muscles'],
     properties: {
       name: {
         type: 'string',
@@ -290,7 +290,8 @@ export const replaceExerciseSchema: SwaggerSchema = {
         type: 'string',
         nullable: true,
         example: 'https://example.com/exercises/incline-dumbbell-press.mp4'
-      }
+      },
+      muscles: musclesProperty
     }
   },
   response: {

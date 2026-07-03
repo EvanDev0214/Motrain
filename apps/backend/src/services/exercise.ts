@@ -82,13 +82,26 @@ export class ExerciseService {
   ) {
     await this.findUserExerciseOrThrow(userId, exerciseId);
 
-    const updated = await this.exerciseRepository.replaceById(exerciseId, data);
+    return await this.db.transaction(async (tx) => {
+      const updated = await this.exerciseRepository.replaceById(exerciseId, data, tx);
 
-    if (!updated) {
-      throw new NotFound404Error('The exercise does not exist or has been deleted.', 'EXERCISE_NOT_FOUND');
-    }
+      if (!updated) {
+        throw new NotFound404Error('The exercise does not exist or has been deleted.', 'EXERCISE_NOT_FOUND');
+      }
 
-    return updated;
+      await this.exerciseMuscleRepository.deleteByExerciseId(exerciseId, tx);
+
+      if (data.muscles.length > 0) {
+        await this.exerciseMuscleRepository.createMany(
+          data.muscles.map(muscle => ({
+            exerciseId,
+            muscleId: muscle.muscleId,
+            muscleRole: muscle.muscleRole
+          })), tx);
+      }
+
+      return updated;
+    });
   }
 
   async deleteExerciseById(userId: UUID, exerciseId: UUID) {
