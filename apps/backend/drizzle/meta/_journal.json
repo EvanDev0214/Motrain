@@ -50,6 +50,13 @@
       "when": 1782893810691,
       "tag": "20260701081650_add_unique_constraint_to_muscles_name",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1783046375603,
+      "tag": "20260703023935_change_muscle_id_on_delete_to_restrict",
+      "breakpoints": true
     }
   ]
 }

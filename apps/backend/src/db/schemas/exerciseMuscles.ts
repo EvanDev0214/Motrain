@@ -6,7 +6,7 @@ export const muscleRoleEnum = pgEnum('muscle_role', ['primary', 'secondary']);
 
 export const exerciseMuscles = pgTable('exercise_muscles', {
   exerciseId: uuid('exercise_id').notNull().references(() => exercises.id, { onDelete: 'cascade' }),
-  muscleId: uuid('muscle_id').notNull().references(() => muscles.id, { onDelete: 'cascade' }),
+  muscleId: uuid('muscle_id').notNull().references(() => muscles.id, { onDelete: 'restrict' }),
   muscleRole: muscleRoleEnum().notNull()
 }, (table) => [
   primaryKey({ columns: [table.exerciseId, table.muscleId] })
