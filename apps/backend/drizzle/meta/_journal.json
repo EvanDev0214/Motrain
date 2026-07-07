@@ -71,6 +71,13 @@
       "when": 1783060221777,
       "tag": "20260703063021_create_workouts_table",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1783395761237,
+      "tag": "20260707034241_create_workout_exercises_table",
+      "breakpoints": true
     }
   ]
 }

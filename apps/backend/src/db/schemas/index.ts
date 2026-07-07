@@ -5,3 +5,4 @@ export * from './exercises';
 export * from './muscles';
 export * from './exerciseMuscles';
 export * from './workouts';
+export * from './workoutExercises';
