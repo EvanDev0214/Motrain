@@ -24,7 +24,18 @@ export const workoutRepository = {
 
   findOneById: async (workoutId: UUID) => {
     const workout = await db.query.workouts.findFirst({
-      where: eq(workouts.id, workoutId)
+      where: eq(workouts.id, workoutId),
+      with: {
+        workoutExercises: {
+          orderBy: (workoutExercises, { asc }) => [asc(workoutExercises.order)],
+          with: {
+            sets: {
+              orderBy: (sets, { asc }) => [asc(sets.order)]
+            },
+            exercise: true
+          }
+        }
+      }
     });
 
     return workout ?? null;
