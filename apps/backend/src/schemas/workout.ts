@@ -1,5 +1,5 @@
-import { rpeEnum, setTypeEnum } from '@/db/schemas';
 import z from 'zod';
+import { rpeEnum, setTypeEnum } from '@/db/schemas';
 
 const weightSchema = z.string().regex(/^\d{1,4}(\.\d{1,2})?$/, { message: '請輸入有效範圍的數字' }).nullable();
 

@@ -1,7 +1,20 @@
 import { Router } from 'express';
 import { authMiddleware, validateMiddleware } from '@/middlewares/validate';
-import { createUserWorkoutSchema, getWorkoutSchema, createUserWorkoutExercisesSchema, replaceUserWorkoutSchema, deleteUserWorkoutSchema } from '@/schemas/workout';
-import { getWorkouts, createUserWorkout, getWorkout, createUserWorkoutExercises, replaceUserWorkout, deleteUserWorkout } from '@/controllers/workout';
+import {
+  createUserWorkoutSchema,
+  getWorkoutSchema,
+  createUserWorkoutExercisesSchema,
+  replaceUserWorkoutSchema,
+  deleteUserWorkoutSchema
+} from '@/schemas/workout';
+import {
+  getWorkouts,
+  createUserWorkout,
+  getWorkout,
+  createUserWorkoutExercises,
+  replaceUserWorkout,
+  deleteUserWorkout
+} from '@/controllers/workout';
 
 const workoutsRouter = Router();
 

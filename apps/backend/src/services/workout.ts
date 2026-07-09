@@ -3,7 +3,11 @@ import { exerciseRepository, type ExerciseRepo } from '@/repositories/exercise';
 import { setRepository, type SetRepo } from '@/repositories/set';
 import { workoutRepository, type WorkoutRepo } from '@/repositories/workout';
 import { workoutExerciseRepository, type WorkoutExerciseRepo } from '@/repositories/workoutExercise';
-import type { CreateUserWorkoutBody, CreateUserWorkoutExercisesBody, ReplaceUserWorkoutBody } from '@/schemas/workout';
+import type {
+  CreateUserWorkoutBody,
+  CreateUserWorkoutExercisesBody,
+  ReplaceUserWorkoutBody
+} from '@/schemas/workout';
 import { NotFound404Error } from '@/utils/error';
 
 export class WorkoutService {

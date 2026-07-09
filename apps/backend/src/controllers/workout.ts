@@ -1,5 +1,13 @@
 import type { Request, Response } from 'express';
-import type { CreateUserWorkoutBody, CreateUserWorkoutExercisesBody, CreateUserWorkoutExercisesParams, DeleteUserWorkoutParams, GetWorkoutParams, ReplaceUserWorkoutBody, ReplaceUserWorkoutParams } from '@/schemas/workout';
+import type {
+  CreateUserWorkoutBody,
+  CreateUserWorkoutExercisesBody,
+  CreateUserWorkoutExercisesParams,
+  DeleteUserWorkoutParams,
+  GetWorkoutParams,
+  ReplaceUserWorkoutBody,
+  ReplaceUserWorkoutParams
+} from '@/schemas/workout';
 import { workoutService } from '@/services/workout';
 
 /**
