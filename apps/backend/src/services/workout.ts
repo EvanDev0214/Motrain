@@ -3,7 +3,7 @@ import { exerciseRepository, type ExerciseRepo } from '@/repositories/exercise';
 import { setRepository, type SetRepo } from '@/repositories/set';
 import { workoutRepository, type WorkoutRepo } from '@/repositories/workout';
 import { workoutExerciseRepository, type WorkoutExerciseRepo } from '@/repositories/workoutExercise';
-import type { CreateUserWorkoutBody, CreateUserWorkoutExercisesBody } from '@/schemas/workout';
+import type { CreateUserWorkoutBody, CreateUserWorkoutExercisesBody, ReplaceUserWorkoutBody } from '@/schemas/workout';
 import { NotFound404Error } from '@/utils/error';
 
 export class WorkoutService {
@@ -93,6 +93,21 @@ export class WorkoutService {
     });
 
     return await this.workoutRepository.findOneById(workoutId);
+  }
+
+  async replaceUserWorkout(
+    userId: UUID,
+    workoutId: UUID,
+    data: ReplaceUserWorkoutBody) {
+    await this.findUserWorkoutOrThrow(userId, workoutId);
+
+    const updatedWorkout = await this.workoutRepository.replaceById(workoutId, data);
+
+    if (!updatedWorkout) {
+      throw new Error('Failed to update workout');
+    }
+
+    return updatedWorkout;
   }
 }
 

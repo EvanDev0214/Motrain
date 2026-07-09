@@ -3,6 +3,7 @@ import { db } from '@/db/db';
 import { workouts } from '@/db/schemas/workouts';
 
 type CreateWorkoutData = Omit<typeof workouts.$inferInsert, 'id' | 'createdAt' | 'updatedAt'>;
+type ReplaceWorkoutData = Omit<CreateWorkoutData, 'userId'>;
 
 export const workoutRepository = {
   // TODO: 這個命名有問題
@@ -39,6 +40,17 @@ export const workoutRepository = {
     });
 
     return workout ?? null;
+  },
+
+  replaceById: async (workoutId: UUID, data: ReplaceWorkoutData) => {
+    const [updatedWorkout] = await db.update(workouts)
+      .set({
+        name: data.name,
+        reflections: data.reflections
+      })
+      .where(eq(workouts.id, workoutId)).returning();
+
+    return updatedWorkout ?? null;
   }
 };
 

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { authMiddleware, validateMiddleware } from '@/middlewares/validate';
-import { createUserWorkoutSchema, getWorkoutSchema, createUserWorkoutExercisesSchema } from '@/schemas/workout';
-import { getWorkouts, createUserWorkout, getWorkout, createUserWorkoutExercises } from '@/controllers/workout';
+import { createUserWorkoutSchema, getWorkoutSchema, createUserWorkoutExercisesSchema, replaceUserWorkoutSchema } from '@/schemas/workout';
+import { getWorkouts, createUserWorkout, getWorkout, createUserWorkoutExercises, replaceUserWorkout } from '@/controllers/workout';
 
 const workoutsRouter = Router();
 
@@ -12,7 +12,8 @@ workoutsRouter
 
 workoutsRouter
   .route('/:workoutId')
-  .get(authMiddleware('ACCESS'), validateMiddleware(getWorkoutSchema), getWorkout);
+  .get(authMiddleware('ACCESS'), validateMiddleware(getWorkoutSchema), getWorkout)
+  .put(authMiddleware('ACCESS'), validateMiddleware(replaceUserWorkoutSchema), replaceUserWorkout);
 
 workoutsRouter
   .route('/:workoutId/exercises')

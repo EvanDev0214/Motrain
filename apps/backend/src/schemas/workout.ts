@@ -73,7 +73,16 @@ export const createUserWorkoutExercisesSchema = z.object({
   })
 });
 
+export const replaceUserWorkoutSchema = z.object({
+  body: createUserWorkoutSchema.shape.body,
+  params: z.object({
+    workoutId: z.uuid('請提供有效的 UUID')
+  })
+});
+
 export type CreateUserWorkoutBody = z.infer<typeof createUserWorkoutSchema>['body'];
 export type GetWorkoutParams = z.infer<typeof getWorkoutSchema>['params'];
 export type CreateUserWorkoutExercisesBody = z.infer<typeof createUserWorkoutExercisesSchema>['body'];
 export type CreateUserWorkoutExercisesParams = z.infer<typeof createUserWorkoutExercisesSchema>['params'];
+export type ReplaceUserWorkoutBody = z.infer<typeof replaceUserWorkoutSchema>['body'];
+export type ReplaceUserWorkoutParams = z.infer<typeof replaceUserWorkoutSchema>['params'];

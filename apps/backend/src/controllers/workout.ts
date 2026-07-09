@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import type { CreateUserWorkoutBody, CreateUserWorkoutExercisesBody, CreateUserWorkoutExercisesParams, GetWorkoutParams } from '@/schemas/workout';
+import type { CreateUserWorkoutBody, CreateUserWorkoutExercisesBody, CreateUserWorkoutExercisesParams, GetWorkoutParams, ReplaceUserWorkoutBody, ReplaceUserWorkoutParams } from '@/schemas/workout';
 import { workoutService } from '@/services/workout';
 
 /**
@@ -162,5 +162,54 @@ export const createUserWorkoutExercises = async (
   res.status(201).json({
     status: 'success',
     data: workout
+  });
+};
+
+/**
+ * @openapi
+ * /api/workouts/{workoutId}:
+ *   put:
+ *     tags:
+ *       - Workouts
+ *     summary: Replace a user workout
+ *     description: Replace the name and reflections of a workout belonging to the authenticated user
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: workoutId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: The workout UUID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/workouts/createUserWorkoutSchema/request'
+ *     responses:
+ *       200:
+ *         description: Workout replaced successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/workouts/createUserWorkoutSchema/response'
+ *       401:
+ *         description: "`INVALID_TOKEN` : Invalid or expired access token"
+ *       404:
+ *         description: "`WORKOUT_NOT_FOUND` : The workout does not exist or has been deleted"
+ */
+export const replaceUserWorkout = async (
+  req: Request<ReplaceUserWorkoutParams, unknown, ReplaceUserWorkoutBody>,
+  res: Response
+) => {
+  const { user, params, body } = req;
+  const updatedWorkout = await workoutService.replaceUserWorkout(user!.userId, params.workoutId, body);
+
+  res.status(200).json({
+    status: 'success',
+    data: updatedWorkout
   });
 };
