@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import type { CreateUserWorkoutBody, CreateUserWorkoutExercisesBody, CreateUserWorkoutExercisesParams, GetWorkoutParams, ReplaceUserWorkoutBody, ReplaceUserWorkoutParams } from '@/schemas/workout';
+import type { CreateUserWorkoutBody, CreateUserWorkoutExercisesBody, CreateUserWorkoutExercisesParams, DeleteUserWorkoutParams, GetWorkoutParams, ReplaceUserWorkoutBody, ReplaceUserWorkoutParams } from '@/schemas/workout';
 import { workoutService } from '@/services/workout';
 
 /**
@@ -212,4 +212,40 @@ export const replaceUserWorkout = async (
     status: 'success',
     data: updatedWorkout
   });
+};
+
+/**
+ * @openapi
+ * /api/workouts/{workoutId}:
+ *   delete:
+ *     tags:
+ *       - Workouts
+ *     summary: Delete a user workout
+ *     description: Delete a workout belonging to the authenticated user
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: workoutId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: The workout UUID
+ *     responses:
+ *       204:
+ *         description: Workout deleted successfully
+ *       401:
+ *         description: "`INVALID_TOKEN` : Invalid or expired access token"
+ *       404:
+ *         description: "`WORKOUT_NOT_FOUND` : The workout does not exist or has been deleted"
+ */
+export const deleteUserWorkout = async (
+  req: Request<DeleteUserWorkoutParams>,
+  res: Response
+) => {
+  const { user, params } = req;
+  await workoutService.deleteUserWorkout(user!.userId, params.workoutId);
+
+  res.status(204).send();
 };

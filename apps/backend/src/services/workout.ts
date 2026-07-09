@@ -109,6 +109,11 @@ export class WorkoutService {
 
     return updatedWorkout;
   }
+
+  async deleteUserWorkout(userId: UUID, workoutId: UUID) {
+    await this.findUserWorkoutOrThrow(userId, workoutId);
+    await this.workoutRepository.deleteById(workoutId);
+  }
 }
 
 export const workoutService = new WorkoutService(

@@ -51,6 +51,10 @@ export const workoutRepository = {
       .where(eq(workouts.id, workoutId)).returning();
 
     return updatedWorkout ?? null;
+  },
+
+  deleteById: async (workoutId: UUID) => {
+    await db.delete(workouts).where(eq(workouts.id, workoutId));
   }
 };
 
