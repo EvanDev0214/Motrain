@@ -1,4 +1,8 @@
-import { db, type DbClient } from '@/db/db';
+import {
+  db,
+  type DbClient,
+  type DbTransaction
+} from '@/db/db';
 import { exerciseRepository, type ExerciseRepo } from '@/repositories/exercise';
 import { setRepository, type SetRepo } from '@/repositories/set';
 import { workoutRepository, type WorkoutRepo } from '@/repositories/workout';
@@ -6,7 +10,8 @@ import { workoutExerciseRepository, type WorkoutExerciseRepo } from '@/repositor
 import type {
   CreateUserWorkoutBody,
   CreateUserWorkoutExercisesBody,
-  ReplaceUserWorkoutBody
+  ReplaceUserWorkoutBody,
+  ReplaceUserWorkoutExercisesBody
 } from '@/schemas/workout';
 import { NotFound404Error } from '@/utils/error';
 
@@ -31,6 +36,46 @@ export class WorkoutService {
     }
 
     return workout;
+  }
+
+  private async saveWorkoutExercises(
+    userId: UUID,
+    workoutId: UUID,
+    data: CreateUserWorkoutExercisesBody,
+    tx: DbTransaction
+  ) {
+    const uniqueExerciseIds = [... new Set(data.exercises.map(exercise => exercise.exerciseId))];
+
+    const exercises = await this.exerciseRepository.findManyByIds(uniqueExerciseIds, userId);
+
+    if (exercises.length !== uniqueExerciseIds.length) {
+      throw new NotFound404Error('The exercise does not exist or has been deleted.', 'EXERCISE_NOT_FOUND');
+    }
+
+    const createdWorkoutExercises = await this.workoutExerciseRepository.createMany(
+      data.exercises.map(exercise => ({
+        exerciseId: exercise.exerciseId,
+        supersetId: exercise.supersetId,
+        workoutId: workoutId,
+        order: exercise.order
+      })), tx);
+
+    const allSets = data.exercises.flatMap(exercise => {
+      const workoutExercise = createdWorkoutExercises.find(we => we.order === exercise.order);
+
+      if (!workoutExercise) {
+        throw new Error('Failed to match workout exercise.');
+      }
+
+      return exercise.sets.map(set => ({
+        workoutExerciseId: workoutExercise.id,
+        ...set
+      }));
+    });
+
+    if (allSets.length > 0) {
+      await this.setRepository.createMany(allSets, tx);
+    }
   }
 
   // TODO: 這個命名有問題
@@ -61,39 +106,23 @@ export class WorkoutService {
   ) {
     const workout = await this.findUserWorkoutOrThrow(userId, workoutId);
 
-    const uniqueExerciseIds = [... new Set(data.exercises.map(exercise => exercise.exerciseId))];
+    await this.db.transaction(async (tx) => {
+      await this.saveWorkoutExercises(userId, workout.id, data, tx);
+    });
 
-    const exercises = await this.exerciseRepository.findManyByIds(uniqueExerciseIds, userId);
+    return await this.workoutRepository.findOneById(workoutId);
+  }
 
-    if (exercises.length !== uniqueExerciseIds.length) {
-      throw new NotFound404Error('The exercise does not exist or has been deleted.', 'EXERCISE_NOT_FOUND');
-    }
+  async replaceUserWorkoutExercises(
+    userId: UUID,
+    workoutId: UUID,
+    data: ReplaceUserWorkoutExercisesBody
+  ) {
+    const workout = await this.findUserWorkoutOrThrow(userId, workoutId);
 
     await this.db.transaction(async (tx) => {
-      const createdWorkoutExercises = await this.workoutExerciseRepository.createMany(
-        data.exercises.map(exercise => ({
-          exerciseId: exercise.exerciseId,
-          supersetId: exercise.supersetId,
-          workoutId: workout.id,
-          order: exercise.order
-        })), tx);
-
-      const allSets = data.exercises.flatMap(exercise => {
-        const workoutExercise = createdWorkoutExercises.find(we => we.order === exercise.order);
-
-        if (!workoutExercise) {
-          throw new Error('Failed to match workout exercise.');
-        }
-
-        return exercise.sets.map(set => ({
-          workoutExerciseId: workoutExercise.id,
-          ...set
-        }));
-      });
-
-      if (allSets.length > 0) {
-        await this.setRepository.createMany(allSets, tx);
-      }
+      await this.workoutExerciseRepository.deleteByWorkoutId(workout.id, tx);
+      await this.saveWorkoutExercises(userId, workout.id, data, tx);
     });
 
     return await this.workoutRepository.findOneById(workoutId);

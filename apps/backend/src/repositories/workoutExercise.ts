@@ -1,3 +1,4 @@
+import { eq } from 'drizzle-orm';
 import { db, type DbTransaction } from '@/db/db';
 import { workoutExercises } from '@/db/schemas';
 
@@ -17,6 +18,11 @@ export const workoutExerciseRepository = {
     return await client.insert(workoutExercises)
       .values(data)
       .returning();
+  },
+  deleteByWorkoutId: async (workoutId: UUID, tx?: DbTransaction) => {
+    const client = tx ?? db;
+    await client.delete(workoutExercises)
+      .where(eq(workoutExercises.workoutId, workoutId));
   }
 };
 

@@ -82,6 +82,8 @@ export const replaceUserWorkoutSchema = z.object({
 
 export const deleteUserWorkoutSchema = getWorkoutSchema;
 
+export const replaceUserWorkoutExercisesSchema = createUserWorkoutExercisesSchema;
+
 export type CreateUserWorkoutBody = z.infer<typeof createUserWorkoutSchema>['body'];
 export type GetWorkoutParams = z.infer<typeof getWorkoutSchema>['params'];
 export type CreateUserWorkoutExercisesBody = z.infer<typeof createUserWorkoutExercisesSchema>['body'];
@@ -89,3 +91,5 @@ export type CreateUserWorkoutExercisesParams = z.infer<typeof createUserWorkoutE
 export type ReplaceUserWorkoutBody = z.infer<typeof replaceUserWorkoutSchema>['body'];
 export type ReplaceUserWorkoutParams = z.infer<typeof replaceUserWorkoutSchema>['params'];
 export type DeleteUserWorkoutParams = z.infer<typeof deleteUserWorkoutSchema>['params'];
+export type ReplaceUserWorkoutExercisesBody = z.infer<typeof replaceUserWorkoutExercisesSchema>['body'];
+export type ReplaceUserWorkoutExercisesParams = z.infer<typeof replaceUserWorkoutExercisesSchema>['params'];

@@ -5,7 +5,8 @@ import {
   getWorkoutSchema,
   createUserWorkoutExercisesSchema,
   replaceUserWorkoutSchema,
-  deleteUserWorkoutSchema
+  deleteUserWorkoutSchema,
+  replaceUserWorkoutExercisesSchema
 } from '@/schemas/workout';
 import {
   getWorkouts,
@@ -13,7 +14,8 @@ import {
   getWorkout,
   createUserWorkoutExercises,
   replaceUserWorkout,
-  deleteUserWorkout
+  deleteUserWorkout,
+  replaceUserWorkoutExercises
 } from '@/controllers/workout';
 
 const workoutsRouter = Router();
@@ -31,6 +33,7 @@ workoutsRouter
 
 workoutsRouter
   .route('/:workoutId/exercises')
-  .post(authMiddleware('ACCESS'), validateMiddleware(createUserWorkoutExercisesSchema), createUserWorkoutExercises);
+  .post(authMiddleware('ACCESS'), validateMiddleware(createUserWorkoutExercisesSchema), createUserWorkoutExercises)
+  .put(authMiddleware('ACCESS'), validateMiddleware(replaceUserWorkoutExercisesSchema), replaceUserWorkoutExercises);
 
 export default workoutsRouter;
