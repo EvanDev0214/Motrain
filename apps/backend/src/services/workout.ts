@@ -1,10 +1,18 @@
+import { db, type DbClient } from '@/db/db';
+import { exerciseRepository, type ExerciseRepo } from '@/repositories/exercise';
+import { setRepository, type SetRepo } from '@/repositories/set';
 import { workoutRepository, type WorkoutRepo } from '@/repositories/workout';
-import type { CreateUserWorkoutBody } from '@/schemas/workout';
+import { workoutExerciseRepository, type WorkoutExerciseRepo } from '@/repositories/workoutExercise';
+import type { CreateUserWorkoutBody, CreateUserWorkoutExercisesBody } from '@/schemas/workout';
 import { NotFound404Error } from '@/utils/error';
 
 export class WorkoutService {
   constructor(
-    private workoutRepository: WorkoutRepo
+    private db: DbClient,
+    private workoutRepository: WorkoutRepo,
+    private exerciseRepository: ExerciseRepo,
+    private workoutExerciseRepository: WorkoutExerciseRepo,
+    private setRepository: SetRepo
   ) {}
 
   // TODO: 這個命名有問題
@@ -35,6 +43,65 @@ export class WorkoutService {
 
     return workout;
   }
+
+  async createUserWorkoutExercises(
+    userId: UUID,
+    workoutId: UUID,
+    data: CreateUserWorkoutExercisesBody
+  ) {
+    const workout = await this.workoutRepository.findOneById(workoutId);
+
+    if (!workout) {
+      throw new NotFound404Error('The workout does not exist or has been deleted.', 'WORKOUT_NOT_FOUND');
+    }
+
+    if (workout.userId !== userId) {
+      throw new NotFound404Error('The workout does not exist or has been deleted.', 'WORKOUT_NOT_FOUND');
+    }
+
+    const uniqueExerciseIds = [... new Set(data.exercises.map(exercise => exercise.exerciseId))];
+
+    const exercises = await this.exerciseRepository.findManyByIds(uniqueExerciseIds, userId);
+
+    if (exercises.length !== uniqueExerciseIds.length) {
+      throw new NotFound404Error('The exercise does not exist or has been deleted.', 'EXERCISE_NOT_FOUND');
+    }
+
+    await this.db.transaction(async (tx) => {
+      const createdWorkoutExercises = await this.workoutExerciseRepository.createMany(
+        data.exercises.map(exercise => ({
+          exerciseId: exercise.exerciseId,
+          supersetId: exercise.supersetId,
+          workoutId: workout.id,
+          order: exercise.order
+        })), tx);
+
+      const allSets = data.exercises.flatMap(exercise => {
+        const workoutExercise = createdWorkoutExercises.find(we => we.order === exercise.order);
+
+        if (!workoutExercise) {
+          throw new Error('Failed to match workout exercise.');
+        }
+
+        return exercise.sets.map(set => ({
+          workoutExerciseId: workoutExercise.id,
+          ...set
+        }));
+      });
+
+      if (allSets.length > 0) {
+        await this.setRepository.createMany(allSets, tx);
+      }
+    });
+
+    return await this.workoutRepository.findOneById(workoutId);
+  }
 }
 
-export const workoutService = new WorkoutService(workoutRepository);
+export const workoutService = new WorkoutService(
+  db,
+  workoutRepository,
+  exerciseRepository,
+  workoutExerciseRepository,
+  setRepository
+);

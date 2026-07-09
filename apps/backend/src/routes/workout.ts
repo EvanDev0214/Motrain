@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { authMiddleware, validateMiddleware } from '@/middlewares/validate';
-import { createUserWorkoutSchema, getWorkoutSchema } from '@/schemas/workout';
-import { getWorkouts, createUserWorkout, getWorkout } from '@/controllers/workout';
+import { createUserWorkoutSchema, getWorkoutSchema, createUserWorkoutExercisesSchema } from '@/schemas/workout';
+import { getWorkouts, createUserWorkout, getWorkout, createUserWorkoutExercises } from '@/controllers/workout';
 
 const workoutsRouter = Router();
 
@@ -13,5 +13,9 @@ workoutsRouter
 workoutsRouter
   .route('/:workoutId')
   .get(authMiddleware('ACCESS'), validateMiddleware(getWorkoutSchema), getWorkout);
+
+workoutsRouter
+  .route('/:workoutId/exercises')
+  .post(authMiddleware('ACCESS'), validateMiddleware(createUserWorkoutExercisesSchema), createUserWorkoutExercises);
 
 export default workoutsRouter;
