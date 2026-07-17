@@ -1,4 +1,4 @@
-import { eq, or } from 'drizzle-orm';
+import { eq, or, and, inArray } from 'drizzle-orm';
 import { db, type DbTransaction } from '@/db/db';
 import { exercises } from '@/db/schemas/exercises';
 
@@ -52,6 +52,19 @@ export const exerciseRepository = {
         muscleRole: exerciseMuscle.muscleRole
       }))
     };
+  },
+
+  findManyByIds: async (exerciseIds: UUID[], userId: UUID) => {
+    return await db.select().from(exercises)
+      .where(
+        and(
+          inArray(exercises.id, exerciseIds),
+          or(
+            eq(exercises.isSystem, true),
+            eq(exercises.userId, userId)
+          )
+        )
+      );
   },
 
   replaceById: async (

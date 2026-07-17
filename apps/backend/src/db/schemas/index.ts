@@ -4,3 +4,6 @@ export * from './refreshTokens';
 export * from './exercises';
 export * from './muscles';
 export * from './exerciseMuscles';
+export * from './workouts';
+export * from './workoutExercises';
+export * from './sets';

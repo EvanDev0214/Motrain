@@ -1,4 +1,5 @@
-import { pgTable, uuid, boolean, varchar, pgEnum, timestamp } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, boolean, varchar, pgEnum, timestamp, uniqueIndex } from 'drizzle-orm/pg-core';
+import { sql } from 'drizzle-orm';
 import { users } from '@/db/schemas/users';
 
 export const defaultWeightModeEnum = pgEnum('default_weight_mode', ['single', 'bilateral']);
@@ -24,4 +25,8 @@ export const exercises = pgTable('exercises', {
   mediaUrl: varchar('media_url', { length: 500 }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow().$onUpdateFn(() => new Date())
-});
+}, (table) => [
+  uniqueIndex('system_exercise_name_idx')
+    .on(table.name)
+    .where(sql`${table.isSystem} = true`)
+]);

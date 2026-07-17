@@ -11,7 +11,8 @@
     "db:generate": "read -p 'Migration name: ' name && drizzle-kit generate --name=$name",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
-    "db:seed:muscles": "tsx src/db/seeds/muscle.ts"
+    "db:seed:muscles": "tsx src/db/seeds/muscle.ts",
+    "db:seed:systemExercises": "tsx src/db/seeds/systemExercise.ts"
   },
   "author": "Evan",
   "license": "ISC",

@@ -64,6 +64,34 @@
       "when": 1783057325589,
       "tag": "20260703054205_rename_muscle_role_and_default_weight_mode_to_snake_case",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1783060221777,
+      "tag": "20260703063021_create_workouts_table",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1783395761237,
+      "tag": "20260707034241_create_workout_exercises_table",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1783411574148,
+      "tag": "20260707080614_create_sets_table",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1783486012583,
+      "tag": "20260708044652_add_system_exercise_unique_index",
+      "breakpoints": true
     }
   ]
 }
