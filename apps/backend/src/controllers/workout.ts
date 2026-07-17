@@ -44,7 +44,7 @@ export const getWorkouts = async (
   });
 };
 
-/**d
+/**
  * @openapi
  * /api/workouts:
  *   post:

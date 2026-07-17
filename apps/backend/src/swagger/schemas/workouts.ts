@@ -197,6 +197,7 @@ export const createUserWorkoutSchema: SwaggerSchema = {
     properties: {
       name: {
         type: 'string',
+        maxLength: 30,
         example: 'Push Day'
       },
       reflections: {
