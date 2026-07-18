@@ -5,7 +5,8 @@ import type {
   GetExerciseParams,
   ReplaceExerciseBody,
   ReplaceExerciseParams,
-  DeleteExerciseParams
+  DeleteExerciseParams,
+  GetExerciseHistoryParams
 } from '@/schemas/exercise';
 
 /**
@@ -215,4 +216,17 @@ export const deleteExercise = async (
   await exerciseService.deleteExerciseById(user!.userId, params.exerciseId);
 
   res.status(204).send();
+};
+
+export const getExerciseHistory = async (
+  req: Request<GetExerciseHistoryParams>,
+  res: Response
+) => {
+  const { user, params } = req;
+  const exerciseHistory = await exerciseService.getExerciseHistory(user!.userId, params.exerciseId);
+
+  res.status(200).json({
+    status: 'success',
+    data: exerciseHistory
+  });
 };

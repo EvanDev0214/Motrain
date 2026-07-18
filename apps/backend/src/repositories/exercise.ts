@@ -1,6 +1,7 @@
-import { eq, or, and, inArray } from 'drizzle-orm';
+import { eq, or, and, inArray, desc, asc } from 'drizzle-orm';
 import { db, type DbTransaction } from '@/db/db';
 import { exercises } from '@/db/schemas/exercises';
+import { sets, workoutExercises, workouts } from '@/db/schemas';
 
 export type CreateExerciseData = Omit<typeof exercises.$inferInsert, 'id' | 'createdAt' | 'updatedAt'>;
 export type ReplaceExerciseData = Pick<typeof exercises.$inferInsert, 'name' | 'equipment' | 'defaultWeightMode' | 'mediaUrl'>;
@@ -91,6 +92,36 @@ export const exerciseRepository = {
       .returning();
 
     return exercise ?? null;
+  },
+
+  history: async (exerciseId: UUID, userId: UUID) => {
+    return await db.select({
+      workoutId: workouts.id,
+      workoutName: workouts.name,
+      workoutDate: workouts.createdAt,
+      setOrder: sets.order,
+      setType: sets.setType,
+      weight: sets.weight,
+      weightLeft: sets.weightLeft,
+      weightRight: sets.weightRight,
+      reps: sets.reps,
+      rpe: sets.rpe,
+      restSeconds: sets.restSeconds,
+      note: sets.note
+    })
+      .from(workoutExercises)
+      .innerJoin(workouts, eq(workouts.id, workoutExercises.workoutId))
+      .innerJoin(sets, eq(sets.workoutExerciseId, workoutExercises.id))
+      .where(
+        and(
+          eq(workoutExercises.exerciseId, exerciseId),
+          eq(workouts.userId, userId)
+        )
+      )
+      .orderBy(
+        desc(workouts.createdAt),
+        asc(sets.order)
+      );
   }
 };
 
