@@ -3,6 +3,7 @@ import { exerciseRepository, type ExerciseRepo } from '@/repositories/exercise';
 import { exerciseMuscleRepository, type ExerciseMuscleRepo } from '@/repositories/exerciseMuscle';
 import { muscleRepository, type MuscleRepo } from '@/repositories/muscle';
 import type { CreateUserExerciseBody, ReplaceExerciseBody } from '@/schemas/exercise';
+import type { ExerciseHistoryRecord } from '@/@types/exercise';
 import { Forbidden403Error, NotFound404Error } from '@/utils/error';
 
 export class ExerciseService {
@@ -128,6 +129,49 @@ export class ExerciseService {
     }
 
     return deleted;
+  }
+
+  async getExerciseHistory(userId: UUID, exerciseId: UUID) {
+    const exercise = await this.exerciseRepository.findById(exerciseId);
+
+    if (!exercise) {
+      throw new NotFound404Error('The exercise does not exist or has been deleted.', 'EXERCISE_NOT_FOUND');
+    }
+
+    if (exercise.userId !== userId && !exercise.isSystem) {
+      throw new NotFound404Error('The exercise does not exist or has been deleted.', 'EXERCISE_NOT_FOUND');
+    }
+
+    const rawHistory = await this.exerciseRepository.history(exercise.id, userId);
+
+    const map = new Map<string, ExerciseHistoryRecord>();
+
+    for (const row of rawHistory) {
+      const set = {
+        setOrder: row.setOrder,
+        setType: row.setType,
+        weight: row.weight,
+        weightLeft: row.weightLeft,
+        weightRight: row.weightRight,
+        reps: row.reps,
+        rpe: row.rpe,
+        restSeconds: row.restSeconds,
+        note: row.note
+      };
+
+      if (!map.has(row.workoutId)) {
+        map.set(row.workoutId, {
+          workoutId: row.workoutId,
+          workoutName: row.workoutName,
+          workoutDate: row.workoutDate,
+          sets: []
+        });
+      }
+
+      map.get(row.workoutId)?.sets.push(set);
+    }
+
+    return Array.from(map.values());
   }
 }
 

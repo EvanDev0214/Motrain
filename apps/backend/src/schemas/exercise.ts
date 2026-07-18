@@ -36,8 +36,15 @@ export const replaceExerciseSchema = z.object({
 
 export const deleteExerciseSchema = getExerciseSchema;
 
+export const getExerciseHistorySchema = z.object({
+  params: z.object({
+    exerciseId: z.uuid('請提供有效的 UUID')
+  })
+});
+
 export type CreateUserExerciseBody = z.infer<typeof createUserExerciseSchema>['body'];
 export type GetExerciseParams = z.infer<typeof getExerciseSchema>['params'];
 export type ReplaceExerciseBody = z.infer<typeof replaceExerciseSchema>['body'];
 export type ReplaceExerciseParams = z.infer<typeof replaceExerciseSchema>['params'];
 export type DeleteExerciseParams = z.infer<typeof deleteExerciseSchema>['params'];
+export type GetExerciseHistoryParams = z.infer<typeof getExerciseHistorySchema>['params'];

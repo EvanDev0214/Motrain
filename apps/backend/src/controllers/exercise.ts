@@ -5,7 +5,8 @@ import type {
   GetExerciseParams,
   ReplaceExerciseBody,
   ReplaceExerciseParams,
-  DeleteExerciseParams
+  DeleteExerciseParams,
+  GetExerciseHistoryParams
 } from '@/schemas/exercise';
 
 /**
@@ -215,4 +216,47 @@ export const deleteExercise = async (
   await exerciseService.deleteExerciseById(user!.userId, params.exerciseId);
 
   res.status(204).send();
+};
+
+/**
+ * @openapi
+ * /api/exercises/{exerciseId}/history:
+ *   get:
+ *     tags:
+ *       - Exercises
+ *     summary: Get exercise history
+ *     description: Retrieve the authenticated user's past workout sets for a specific exercise, grouped by workout
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: exerciseId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: The exercise UUID
+ *     responses:
+ *       200:
+ *         description: Exercise history retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/exercises/getExerciseHistorySchema/response'
+ *       401:
+ *         description: "`INVALID_TOKEN` : Invalid or expired access token"
+ *       404:
+ *         description: "`EXERCISE_NOT_FOUND` : The exercise does not exist or has been deleted"
+ */
+export const getExerciseHistory = async (
+  req: Request<GetExerciseHistoryParams>,
+  res: Response
+) => {
+  const { user, params } = req;
+  const exerciseHistory = await exerciseService.getExerciseHistory(user!.userId, params.exerciseId);
+
+  res.status(200).json({
+    status: 'success',
+    data: exerciseHistory
+  });
 };

@@ -5,13 +5,15 @@ import {
   createUserExercise,
   getExercise,
   replaceExercise,
-  deleteExercise
+  deleteExercise,
+  getExerciseHistory
 } from '@/controllers/exercise';
 import {
   createUserExerciseSchema,
   getExerciseSchema,
   replaceExerciseSchema,
-  deleteExerciseSchema
+  deleteExerciseSchema,
+  getExerciseHistorySchema
 } from '@/schemas/exercise';
 
 const exercisesRouter = Router();
@@ -26,5 +28,9 @@ exercisesRouter
   .get(authMiddleware('ACCESS'), validateMiddleware(getExerciseSchema), getExercise)
   .put(authMiddleware('ACCESS'), validateMiddleware(replaceExerciseSchema), replaceExercise)
   .delete(authMiddleware('ACCESS'), validateMiddleware(deleteExerciseSchema), deleteExercise);
+
+exercisesRouter
+  .route('/:exerciseId/history')
+  .get(authMiddleware('ACCESS'), validateMiddleware(getExerciseHistorySchema), getExerciseHistory);
 
 export default exercisesRouter;
