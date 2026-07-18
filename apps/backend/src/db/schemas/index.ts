@@ -7,3 +7,4 @@ export * from './exerciseMuscles';
 export * from './workouts';
 export * from './workoutExercises';
 export * from './sets';
+export * from './bodyWeights';

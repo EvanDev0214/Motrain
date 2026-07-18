@@ -92,6 +92,13 @@
       "when": 1783486012583,
       "tag": "20260708044652_add_system_exercise_unique_index",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1784362205438,
+      "tag": "20260718081005_create_body_weights_table",
+      "breakpoints": true
     }
   ]
 }
