@@ -258,6 +258,95 @@ export const getExerciseSchema: SwaggerSchema = {
   }
 };
 
+const exerciseHistorySetProperty = {
+  type: 'object' as const,
+  properties: {
+    setOrder: {
+      type: 'integer' as const,
+      example: 1
+    },
+    setType: {
+      type: 'string' as const,
+      enum: ['warmup', 'formal', 'decrease', 'superset'],
+      example: 'formal'
+    },
+    weight: {
+      type: 'string' as const,
+      nullable: true,
+      example: '80.5'
+    },
+    weightLeft: {
+      type: 'string' as const,
+      nullable: true,
+      example: null
+    },
+    weightRight: {
+      type: 'string' as const,
+      nullable: true,
+      example: null
+    },
+    reps: {
+      type: 'integer' as const,
+      nullable: true,
+      example: 10
+    },
+    rpe: {
+      type: 'string' as const,
+      enum: ['6', '6.5', '7', '7.5', '8', '8.5', '9', '9.5', '10'],
+      nullable: true,
+      example: '8'
+    },
+    restSeconds: {
+      type: 'integer' as const,
+      nullable: true,
+      example: 90
+    },
+    note: {
+      type: 'string' as const,
+      nullable: true,
+      example: null
+    }
+  }
+};
+
+export const getExerciseHistorySchema: SwaggerSchema = {
+  response: {
+    type: 'object',
+    properties: {
+      status: {
+        type: 'string',
+        example: 'success'
+      },
+      data: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            workoutId: {
+              type: 'string',
+              format: 'uuid',
+              example: '550e8400-e29b-41d4-a716-446655440000'
+            },
+            workoutName: {
+              type: 'string',
+              example: 'Push Day'
+            },
+            workoutDate: {
+              type: 'string',
+              format: 'date-time',
+              example: '2026-06-22T00:00:00.000Z'
+            },
+            sets: {
+              type: 'array',
+              items: exerciseHistorySetProperty
+            }
+          }
+        }
+      }
+    }
+  }
+};
+
 export const replaceExerciseSchema: SwaggerSchema = {
   request: {
     type: 'object',
