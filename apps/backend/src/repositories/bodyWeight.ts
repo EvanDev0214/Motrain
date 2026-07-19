@@ -25,7 +25,7 @@ export const bodyWeightRepository = {
   },
 
   upsert: async (data: CreateBodyWeightData) => {
-    const [upsertedbodyWeight] = await db.insert(bodyWeights).values(data)
+    const [upsertedBodyWeight] = await db.insert(bodyWeights).values(data)
       .onConflictDoUpdate({
         target: [bodyWeights.userId, bodyWeights.recordedAt],
         set: { weight: data.weight }
@@ -36,7 +36,7 @@ export const bodyWeightRepository = {
         recordedAt: bodyWeights.recordedAt
       });
 
-    return upsertedbodyWeight ?? null;
+    return upsertedBodyWeight ?? null;
   },
 
   deleteById: async (bodyWeightId: UUID) => {

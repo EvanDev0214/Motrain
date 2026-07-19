@@ -1,5 +1,5 @@
 import z from 'zod';
-import dayjs from 'dayjs';
+import dayjs from '@/configs/dayjs';
 
 export const createBodyWeightSchema = z.object({
   body: z.object({
