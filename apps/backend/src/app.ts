@@ -1,3 +1,4 @@
+import '@/configs/dayjs';
 import express from 'express';
 import { sql } from 'drizzle-orm';
 import { db } from '@/db/db';
@@ -14,6 +15,7 @@ import authRouter from '@/routes/auth';
 import exercisesRouter from '@/routes/exercise';
 import musclesRouter from '@/routes/muscle';
 import workoutsRouter from '@/routes/workout';
+import bodyWeightsRouter from '@/routes/bodyWeight';
 import { logger } from '@/utils/logger';
 
 const app = express();
@@ -43,6 +45,7 @@ app.use('/api/auth', authRouter);
 app.use('/api/exercises', exercisesRouter);
 app.use('/api/muscles', musclesRouter);
 app.use('/api/workouts', workoutsRouter);
+app.use('/api/body-weights', bodyWeightsRouter);
 
 app.use(routerErrorHandler);
 app.use(errorHandler);
