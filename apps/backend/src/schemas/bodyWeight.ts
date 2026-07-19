@@ -11,4 +11,11 @@ export const createBodyWeightSchema = z.object({
   })
 });
 
+export const deleteBodyWeightSchema = z.object({
+  params: z.object({
+    bodyWeightId: z.uuid('請提供有效的 UUID')
+  })
+});
+
 export type CreateBodyWeightBody = z.infer<typeof createBodyWeightSchema>['body'];
+export type DeleteBodyWeightParams = z.infer<typeof deleteBodyWeightSchema>['params'];

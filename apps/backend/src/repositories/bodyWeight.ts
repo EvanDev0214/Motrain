@@ -16,6 +16,14 @@ export const bodyWeightRepository = {
       .orderBy(desc(bodyWeights.recordedAt));
   },
 
+  findOneById: async (bodyWeightId: UUID) => {
+    const bodyWeight = await db.query.bodyWeights.findFirst({
+      where: eq(bodyWeights.id, bodyWeightId)
+    });
+
+    return bodyWeight ?? null;
+  },
+
   upsert: async (data: CreateBodyWeightData) => {
     const [upsertedbodyWeight] = await db.insert(bodyWeights).values(data)
       .onConflictDoUpdate({
@@ -29,6 +37,10 @@ export const bodyWeightRepository = {
       });
 
     return upsertedbodyWeight ?? null;
+  },
+
+  deleteById: async (bodyWeightId: UUID) => {
+    await db.delete(bodyWeights).where(eq(bodyWeights.id, bodyWeightId));
   }
 };
 

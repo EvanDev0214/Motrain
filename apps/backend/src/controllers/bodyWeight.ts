@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { bodyWeightService } from '@/services/bodyWeight';
-import type { CreateBodyWeightBody } from '@/schemas/bodyWeight';
+import type { CreateBodyWeightBody, DeleteBodyWeightParams } from '@/schemas/bodyWeight';
 
 /**
  * @openapi
@@ -71,4 +71,40 @@ export const createUserBodyWeight = async (
     status: 'success',
     data: upsertedBodyWeight
   });
+};
+
+/**
+ * @openapi
+ * /api/body-weights/{bodyWeightId}:
+ *   delete:
+ *     tags:
+ *       - BodyWeights
+ *     summary: Delete a user body weight
+ *     description: Delete a body weight record belonging to the authenticated user
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: bodyWeightId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: The body weight UUID
+ *     responses:
+ *       204:
+ *         description: Body weight deleted successfully
+ *       401:
+ *         description: "`INVALID_TOKEN` : Invalid or expired access token"
+ *       404:
+ *         description: "`BODY_WEIGHT_NOT_FOUND` : The body weight does not exist or has been deleted"
+ */
+export const deleteUserBodyWeight = async (
+  req: Request<DeleteBodyWeightParams>,
+  res: Response
+) => {
+  const { user, params } = req;
+  await bodyWeightService.deleteUserBodyWeight(user!.userId, params.bodyWeightId);
+
+  res.status(204).send();
 };
