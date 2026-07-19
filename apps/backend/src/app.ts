@@ -1,3 +1,4 @@
+import '@/configs/dayjs';
 import express from 'express';
 import { sql } from 'drizzle-orm';
 import { db } from '@/db/db';
