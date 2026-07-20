@@ -3,6 +3,7 @@ import { db } from '@/db/db';
 import { users } from '@/db/schemas/users';
 import type { RegisterInput } from '@/schemas/auth';
 
+type UpdateUserData = Partial<Pick<typeof users.$inferInsert, 'nickname' | 'avatarUrl' | 'weightUnit'>>;
 type CreateUserData = Omit<RegisterInput, 'password'> & {
   passwordHash: string
 };
@@ -33,17 +34,23 @@ export const userRepository = {
 
     return result[0];
   },
-  findByUserId: async (userId: UUID) => {
-    const result = await db.select().from(users)
-      .where(eq(users.id, userId));
+  findById: async (userId: UUID) => {
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, userId)
+    });
 
-    return result[0];
+    return user ?? null;
   },
   updatePasswordByUserId: async (userId: UUID, passwordHash: string) => {
     await db.update(users)
       .set({ passwordHash })
       .where(eq(users.id, userId));
+  },
+  updateUserById: async (userId: UUID, data: UpdateUserData) => {
+    return await db.update(users)
+      .set(data)
+      .where(eq(users.id, userId));
   }
 };
 
-export type UserRepository = typeof userRepository;
+export type UserRepo = typeof userRepository;

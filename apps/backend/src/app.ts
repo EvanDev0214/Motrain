@@ -12,6 +12,7 @@ import {
 } from '@/middlewares/errorHandler';
 import swaggerMiddleware from '@/middlewares/swagger';
 import authRouter from '@/routes/auth';
+import usersRouter from '@/routes/user';
 import exercisesRouter from '@/routes/exercise';
 import musclesRouter from '@/routes/muscle';
 import workoutsRouter from '@/routes/workout';
@@ -42,6 +43,7 @@ app.get('/ready', async (_req, res) => {
 });
 
 app.use('/api/auth', authRouter);
+app.use('/api/users', usersRouter);
 app.use('/api/exercises', exercisesRouter);
 app.use('/api/muscles', musclesRouter);
 app.use('/api/workouts', workoutsRouter);

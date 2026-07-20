@@ -1,6 +1,6 @@
 import argon2 from 'argon2';
 import type { RegisterInput } from '@/schemas/auth';
-import { userRepository, type UserRepository } from '@/repositories/user';
+import { userRepository, type UserRepo } from '@/repositories/user';
 import { refreshTokensRepository, type RefreshTokensRepository } from '@/repositories/refreshTokens';
 import { BadRequest400Error, Unauthorized401Error } from '@/utils/error';
 import { generateJwt } from '@/utils/jwt';
@@ -9,7 +9,7 @@ import { emailService, type EmailService } from '@/services/email';
 
 class AuthService {
   constructor(
-    private userRepository: UserRepository,
+    private userRepository: UserRepo,
     private refreshTokensRepository: RefreshTokensRepository,
     private emailVerificationService: EmailVerificationService,
     private emailService: EmailService
@@ -101,7 +101,7 @@ class AuthService {
     oldPassword: string,
     newPassword: string
   ) {
-    const user = await this.userRepository.findByUserId(userId);
+    const user = await this.userRepository.findById(userId);
 
     if (!user) {
       throw new Unauthorized401Error('User not found', 'INVALID_TOKEN');
@@ -125,7 +125,7 @@ class AuthService {
   async verifyPasswordOTP(email: Email, otp: string) {
     const { userId } = await this.emailVerificationService.verifyOTP(email, otp);
 
-    const user = await this.userRepository.findByUserId(userId);
+    const user = await this.userRepository.findById(userId);
 
     if (!user) {
       throw new Unauthorized401Error('User not found', 'INVALID_TOKEN');
@@ -141,7 +141,7 @@ class AuthService {
   }
 
   async resetPassword(userId: UUID, newPassword: string) {
-    const user = await this.userRepository.findByUserId(userId);
+    const user = await this.userRepository.findById(userId);
 
     if (!user) {
       throw new Unauthorized401Error('User not found', 'INVALID_TOKEN');

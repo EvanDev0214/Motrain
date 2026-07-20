@@ -11,6 +11,10 @@ const NO_SPECIAL_CHARS = {
 };
 
 const emailField = z.email('請輸入有效的信箱格式').max(255, '信箱長度不可超過 255 個字元');
+export const nicknameField = z.string().trim().min(1, '暱稱不可為空').max(30, '暱稱長度不可超過 30 個字元').regex(
+  NO_SPECIAL_CHARS.pattern,
+  NO_SPECIAL_CHARS.message
+);
 
 export const registerSchema = z.object({
   body: z.object({
@@ -20,10 +24,7 @@ export const registerSchema = z.object({
       ALPHANUMERIC_ONLY.message
     ),
     confirmPassword: z.string().min(1, '確認密碼不可為空'),
-    nickname: z.string().trim().min(1, '暱稱不可為空').max(30, '暱稱長度不可超過 30 個字元').regex(
-      NO_SPECIAL_CHARS.pattern,
-      NO_SPECIAL_CHARS.message
-    )
+    nickname: nicknameField
   }).refine(data => data.password === data.confirmPassword, {
     message: '確認密碼與密碼不一致',
     path: ['confirmPassword']
