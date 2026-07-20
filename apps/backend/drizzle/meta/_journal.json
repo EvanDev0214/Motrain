@@ -99,6 +99,13 @@
       "when": 1784362205438,
       "tag": "20260718081005_create_body_weights_table",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1784522018180,
+      "tag": "20260720043338_add_avatar_url_and_weight_unit_to_users",
+      "breakpoints": true
     }
   ]
 }
