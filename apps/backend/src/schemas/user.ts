@@ -5,7 +5,7 @@ import { weightUnitEnum } from '@/db/schemas';
 export const updateUserProfileSchema = z.object({
   body: z.object({
     nickname: nicknameField.optional(),
-    avatarUrl: z.url('請提供有效的網址').nullable().optional(),
+    avatarUrl: z.url({ protocol: /^https?$/, message: '請提供有效網址' }).nullable().optional(),
     weightUnit: z.enum(weightUnitEnum.enumValues).optional()
   }).refine(
     data => Object.keys(data).length > 0,
