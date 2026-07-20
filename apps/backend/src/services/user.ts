@@ -1,4 +1,5 @@
 import { userRepository, type UserRepo } from '@/repositories/user';
+import type { UpdateUserProfileBody } from '@/schemas/user';
 
 export class UserService {
   constructor(
@@ -20,6 +21,13 @@ export class UserService {
       weightUnit: user.weightUnit,
       emailVerifiedAt: user.emailVerifiedAt
     };
+  }
+
+  async updateUserProfile(userId: UUID, data: UpdateUserProfileBody) {
+    if (Object.keys(data).length === 0) return null;
+
+    await this.userRepository.updateUserById(userId, data);
+    return await this.getMe(userId);
   }
 }
 
