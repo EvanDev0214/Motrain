@@ -1,18 +1,25 @@
-import { userRepository, type UserRepository } from '@/repositories/user';
+import { userRepository, type UserRepo } from '@/repositories/user';
 
 export class UserService {
   constructor(
-    private userRepository: UserRepository
+    private userRepository: UserRepo
   ) {}
 
   async getMe(userId: UUID) {
-    const user = await this.userRepository.findByUserId(userId);
+    const user = await this.userRepository.findById(userId);
 
     if (!user) {
       throw new Error('Failed to query user.');
     }
 
-    return user;
+    return {
+      id: user.id,
+      email: user.email,
+      nickname: user.nickname,
+      avatarUrl: user.avatarUrl,
+      weightUnit: user.weightUnit,
+      emailVerifiedAt: user.emailVerifiedAt
+    };
   }
 }
 

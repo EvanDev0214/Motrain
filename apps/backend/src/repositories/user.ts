@@ -33,11 +33,12 @@ export const userRepository = {
 
     return result[0];
   },
-  findByUserId: async (userId: UUID) => {
-    const result = await db.select().from(users)
-      .where(eq(users.id, userId));
+  findById: async (userId: UUID) => {
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, userId)
+    });
 
-    return result[0];
+    return user ?? null;
   },
   updatePasswordByUserId: async (userId: UUID, passwordHash: string) => {
     await db.update(users)
@@ -46,4 +47,4 @@ export const userRepository = {
   }
 };
 
-export type UserRepository = typeof userRepository;
+export type UserRepo = typeof userRepository;
