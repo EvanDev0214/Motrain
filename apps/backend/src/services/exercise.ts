@@ -52,7 +52,7 @@ export class ExerciseService {
       }
 
       if (data.muscles.length > 0) {
-        const existingMuscles = await this.muscleRepository.findByIds(data.muscles.map(muscle => muscle.muscleId), tx);
+        const existingMuscles = await this.muscleRepository.findAllByIds(data.muscles.map(muscle => muscle.muscleId), tx);
 
         if (existingMuscles.length !== data.muscles.length) {
           throw new NotFound404Error('One or more muscles do not exist.', 'MUSCLE_NOT_FOUND');
@@ -101,7 +101,7 @@ export class ExerciseService {
       await this.exerciseMuscleRepository.deleteByExerciseId(exerciseId, tx);
 
       if (data.muscles.length > 0) {
-        const existingMuscles = await this.muscleRepository.findByIds(data.muscles.map(muscle => muscle.muscleId), tx);
+        const existingMuscles = await this.muscleRepository.findAllByIds(data.muscles.map(muscle => muscle.muscleId), tx);
 
         if (existingMuscles.length !== data.muscles.length) {
           throw new NotFound404Error('One or more muscles do not exist.', 'MUSCLE_NOT_FOUND');

@@ -44,4 +44,4 @@ export const emailVerifyOtpsRepository = {
   }
 };
 
-export type EmailVerifyOtpsRepository = typeof emailVerifyOtpsRepository;
+export type EmailVerifyOtpsRepo = typeof emailVerifyOtpsRepository;

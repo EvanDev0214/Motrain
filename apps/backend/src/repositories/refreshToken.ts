@@ -36,4 +36,4 @@ export const refreshTokensRepository = {
   }
 };
 
-export type RefreshTokensRepository = typeof refreshTokensRepository;
+export type RefreshTokensRepo = typeof refreshTokensRepository;

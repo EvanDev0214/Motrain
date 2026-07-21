@@ -1,7 +1,7 @@
 import argon2 from 'argon2';
 import type { RegisterInput } from '@/schemas/auth';
 import { userRepository, type UserRepo } from '@/repositories/user';
-import { refreshTokensRepository, type RefreshTokensRepository } from '@/repositories/refreshTokens';
+import { refreshTokensRepository, type RefreshTokensRepo } from '@/repositories/refreshToken';
 import { BadRequest400Error, Unauthorized401Error } from '@/utils/error';
 import { generateJwt } from '@/utils/jwt';
 import { emailVerificationService, type EmailVerificationService } from '@/services/emailVerification';
@@ -10,7 +10,7 @@ import { emailService, type EmailService } from '@/services/email';
 class AuthService {
   constructor(
     private userRepository: UserRepo,
-    private refreshTokensRepository: RefreshTokensRepository,
+    private refreshTokensRepository: RefreshTokensRepo,
     private emailVerificationService: EmailVerificationService,
     private emailService: EmailService
   ) {}

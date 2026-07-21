@@ -7,7 +7,7 @@ export const muscleRepository = {
     return await db.select().from(muscles);
   },
 
-  findByIds: async (muscleIds: UUID[], tx?: DbTransaction) => {
+  findAllByIds: async (muscleIds: UUID[], tx?: DbTransaction) => {
     const client = tx ?? db;
     return await client.select().from(muscles)
       .where(inArray(muscles.id, muscleIds));

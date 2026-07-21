@@ -25,7 +25,7 @@ export class WorkoutService {
   ) {}
 
   private async findUserWorkoutOrThrow(userId: UUID, workoutId: UUID) {
-    const workout = await this.workoutRepository.findOneById(workoutId);
+    const workout = await this.workoutRepository.findById(workoutId);
 
     if (!workout) {
       throw new NotFound404Error('The workout does not exist or has been deleted.', 'WORKOUT_NOT_FOUND');
@@ -46,7 +46,7 @@ export class WorkoutService {
   ) {
     const uniqueExerciseIds = [... new Set(data.exercises.map(exercise => exercise.exerciseId))];
 
-    const exercises = await this.exerciseRepository.findManyByIds(uniqueExerciseIds, userId);
+    const exercises = await this.exerciseRepository.findAllByIds(uniqueExerciseIds, userId);
 
     if (exercises.length !== uniqueExerciseIds.length) {
       throw new NotFound404Error('The exercise does not exist or has been deleted.', 'EXERCISE_NOT_FOUND');
@@ -80,7 +80,7 @@ export class WorkoutService {
 
   // TODO: 這個命名有問題
   async getWorkoutsByUserId(userId: UUID) {
-    return await this.workoutRepository.findByUserId(userId);
+    return await this.workoutRepository.findAllByUserId(userId);
   }
 
   async getWorkoutDetails(userId: UUID, workoutId: UUID) {
@@ -110,7 +110,7 @@ export class WorkoutService {
       await this.saveWorkoutExercises(userId, workout.id, data, tx);
     });
 
-    return await this.workoutRepository.findOneById(workoutId);
+    return await this.workoutRepository.findById(workoutId);
   }
 
   async replaceUserWorkoutExercises(
@@ -125,7 +125,7 @@ export class WorkoutService {
       await this.saveWorkoutExercises(userId, workout.id, data, tx);
     });
 
-    return await this.workoutRepository.findOneById(workoutId);
+    return await this.workoutRepository.findById(workoutId);
   }
 
   async replaceUserWorkout(

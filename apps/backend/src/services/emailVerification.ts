@@ -1,6 +1,6 @@
 import env from '@/configs/env';
 import { emailService, type EmailService } from '@/services/email';
-import { emailVerifyOtpsRepository, type EmailVerifyOtpsRepository } from '@/repositories/emailVerifyOtps';
+import { emailVerifyOtpsRepository, type EmailVerifyOtpsRepo } from '@/repositories/emailVerifyOtp';
 import { generateOTP } from '@/utils/otp';
 import { BadRequest400Error } from '@/utils/error';
 
@@ -8,7 +8,7 @@ type OtpPurpose = 'email_verify' | 'password_reset';
 
 export class EmailVerificationService {
   constructor(
-    private emailVerifyOtpsRepository: EmailVerifyOtpsRepository,
+    private emailVerifyOtpsRepository: EmailVerifyOtpsRepo,
     private emailService: EmailService
   ) {}
 

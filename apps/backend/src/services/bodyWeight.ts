@@ -22,7 +22,7 @@ export class BodyWeightService {
   }
 
   async deleteUserBodyWeight(userId: UUID, bodyWeightId: UUID) {
-    const bodyWeight = await this.bodyWeightRepository.findOneById(bodyWeightId);
+    const bodyWeight = await this.bodyWeightRepository.findById(bodyWeightId);
 
     if (!bodyWeight || bodyWeight.userId !== userId) {
       throw new NotFound404Error('The body weight does not exist or has been deleted.', 'BODY_WEIGHT_NOT_FOUND');

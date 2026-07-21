@@ -55,7 +55,7 @@ export const exerciseRepository = {
     };
   },
 
-  findManyByIds: async (exerciseIds: UUID[], userId: UUID) => {
+  findAllByIds: async (exerciseIds: UUID[], userId: UUID) => {
     return await db.select().from(exercises)
       .where(
         and(
