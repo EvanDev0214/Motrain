@@ -26,7 +26,7 @@ export class EmailVerificationService {
     }
 
     const otp = generateOTP(6);
-    await this.emailVerifyOtpsRepository.upsert(userId, to, otp);
+    await this.emailVerifyOtpsRepository.upsert({ userId, email: to, code: otp });
 
     switch (purpose) {
       case 'email_verify':

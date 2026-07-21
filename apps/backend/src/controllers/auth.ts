@@ -3,11 +3,14 @@ import { authService } from '@/services/auth';
 import { emailVerificationService } from '@/services/emailVerification';
 import { userRepository } from '@/repositories/user';
 import type {
-  LoginRequest,
-  UpdatePasswordRequest,
-  ForgotPasswordRequest,
-  VerifyPasswordOtpRequest,
-  ResetPasswordRequest
+  RegisterBody,
+  VerifyEmailOtpBody,
+  ResendEmailOtpBody,
+  LoginBody,
+  UpdatePasswordBody,
+  ForgotPasswordBody,
+  VerifyPasswordOtpBody,
+  ResetPasswordBody
 } from '@/schemas/auth';
 
 /**
@@ -35,16 +38,10 @@ import type {
  *         description: "`EMAIL_EXISTS` : Email already exists"
  */
 export const register = async (
-  req: Request,
+  req: Request<unknown, unknown, RegisterBody>,
   res: Response
 ) => {
-  const { nickname, email, password } = req.body;
-
-  const newUser = await authService.register({
-    nickname,
-    email,
-    password
-  });
+  const newUser = await authService.register(req.body);
 
   await emailVerificationService.sendOTP(newUser.id, newUser.email);
 
@@ -86,12 +83,10 @@ export const register = async (
  *           `OTP_MISMATCH` : OTP validation failed
  */
 export const verifyEmailOTP = async (
-  req: Request,
+  req: Request<unknown, unknown, VerifyEmailOtpBody>,
   res: Response
 ) => {
-  const { email, otp } = req.body;
-
-  await authService.verifyEmailOTP(email, otp);
+  await authService.verifyEmailOTP(req.body);
 
   res.status(200).json({
     status: 'success',
@@ -122,15 +117,13 @@ export const verifyEmailOTP = async (
  *               $ref: '#/components/schemas/auth/resendEmailOtpSchema/response'
  */
 export const resendEmailOTP = async (
-  req: Request,
+  req: Request<unknown, unknown, ResendEmailOtpBody>,
   res: Response
 ) => {
-  const { email } = req.body;
-
-  const data = await userRepository.findByEmail(email);
+  const data = await userRepository.findByEmail(req.body.email);
 
   if (data && !data.emailVerifiedAt) {
-    await emailVerificationService.sendOTP(data.id, email);
+    await emailVerificationService.sendOTP(data.id, data.email);
   }
 
   res.status(200).json({
@@ -164,12 +157,10 @@ export const resendEmailOTP = async (
  *         description: "`INVALID_CREDENTIALS` : Invalid email or password"
  */
 export const login = async (
-  req: Request<unknown, unknown, LoginRequest>,
+  req: Request<unknown, unknown, LoginBody>,
   res: Response
 ) => {
-  const { email, password } = req.body;
-
-  const { accessToken, refreshToken } = await authService.login(email, password);
+  const { accessToken, refreshToken } = await authService.login(req.body);
 
   res.status(200).json({
     status: 'success',
@@ -280,7 +271,7 @@ export const refreshToken = async (
  *         description: "`INVALID_TOKEN` : Invalid or expired access token"
  */
 export const updatePassword = async (
-  req: Request<unknown, unknown, UpdatePasswordRequest>,
+  req: Request<unknown, unknown, UpdatePasswordBody>,
   res: Response
 ) => {
   const { oldPassword, newPassword } = req.body;
@@ -319,11 +310,10 @@ export const updatePassword = async (
  *               $ref: '#/components/schemas/auth/forgotPasswordSchema/response'
  */
 export const forgotPassword = async (
-  req: Request<unknown, unknown, ForgotPasswordRequest>,
+  req: Request<unknown, unknown, ForgotPasswordBody>,
   res: Response
 ) => {
-  const { email } = req.body;
-  await authService.forgotPassword(email);
+  await authService.forgotPassword(req.body.email);
 
   res.status(200).json({
     status: 'success',
@@ -358,7 +348,7 @@ export const forgotPassword = async (
  *           - `OTP_MISMATCH` : OTP validation failed
  */
 export const verifyPasswordOTP = async (
-  req: Request<unknown, unknown, VerifyPasswordOtpRequest>,
+  req: Request<unknown, unknown, VerifyPasswordOtpBody>,
   res: Response
 ) => {
   const { email, otp } = req.body;
@@ -400,11 +390,11 @@ export const verifyPasswordOTP = async (
  *         description: "`INVALID_TOKEN` : Invalid or expired reset token"
  */
 export const resetPassword = async (
-  req: Request<unknown, unknown, ResetPasswordRequest>,
+  req: Request<unknown, unknown, ResetPasswordBody>,
   res: Response
 ) => {
-  const { newPassword } = req.body;
-  await authService.resetPassword(req.user!.userId, newPassword);
+  const { user, body } = req;
+  await authService.resetPassword(user!.userId, body.newPassword);
 
   res.status(200).json({
     status: 'success',
