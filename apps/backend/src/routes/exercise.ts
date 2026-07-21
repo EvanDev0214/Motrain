@@ -18,19 +18,21 @@ import {
 
 const exercisesRouter = Router();
 
+exercisesRouter.use(authMiddleware('ACCESS'));
+
 exercisesRouter
   .route('/')
-  .get(authMiddleware('ACCESS'), getExercises)
-  .post(authMiddleware('ACCESS'), validateMiddleware(createUserExerciseSchema), createUserExercise);
+  .get(getExercises)
+  .post(validateMiddleware(createUserExerciseSchema), createUserExercise);
 
 exercisesRouter
   .route('/:exerciseId')
-  .get(authMiddleware('ACCESS'), validateMiddleware(getExerciseSchema), getExercise)
-  .put(authMiddleware('ACCESS'), validateMiddleware(replaceExerciseSchema), replaceExercise)
-  .delete(authMiddleware('ACCESS'), validateMiddleware(deleteExerciseSchema), deleteExercise);
+  .get(validateMiddleware(getExerciseSchema), getExercise)
+  .put(validateMiddleware(replaceExerciseSchema), replaceExercise)
+  .delete(validateMiddleware(deleteExerciseSchema), deleteExercise);
 
 exercisesRouter
   .route('/:exerciseId/history')
-  .get(authMiddleware('ACCESS'), validateMiddleware(getExerciseHistorySchema), getExerciseHistory);
+  .get(validateMiddleware(getExerciseHistorySchema), getExerciseHistory);
 
 export default exercisesRouter;
