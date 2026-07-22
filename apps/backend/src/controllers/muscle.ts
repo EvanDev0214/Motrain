@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import { muscleService } from '@/services/muscle';
+import { sendSuccess } from '@/utils/response';
 
 /**
  * @openapi
@@ -27,8 +28,7 @@ export const getMuscles = async (
 ) => {
   const muscles = await muscleService.getMuscles();
 
-  res.status(200).json({
-    status: 'success',
+  return sendSuccess(res, 200, {
     data: muscles
   });
 };

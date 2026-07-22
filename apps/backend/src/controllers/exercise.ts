@@ -8,6 +8,7 @@ import type {
   DeleteExerciseParams,
   GetExerciseHistoryParams
 } from '@/schemas/exercise';
+import { sendSuccess, sendNoContent } from '@/utils/response';
 
 /**
  * @openapi
@@ -36,8 +37,7 @@ export const getExercises = async (
   const { user } = req;
   const exercises = await exerciseService.getExercises(user!.userId);
 
-  res.status(200).json({
-    status: 'success',
+  return sendSuccess(res, 200, {
     data: exercises
   });
 };
@@ -77,8 +77,7 @@ export const createUserExercise = async (
   const { body, user } = req;
   const exercise = await exerciseService.createUserExercise(user!.userId, body);
 
-  res.status(201).json({
-    status: 'success',
+  return sendSuccess(res, 201, {
     data: exercise
   });
 };
@@ -121,8 +120,7 @@ export const getExercise = async (
   const { userId } = req.user!;
   const exercise = await exerciseService.getExerciseById(userId, exerciseId);
 
-  res.status(200).json({
-    status: 'success',
+  return sendSuccess(res, 200, {
     data: exercise
   });
 };
@@ -174,8 +172,7 @@ export const replaceExercise = async (
   const { user, params, body } = req;
   const exercise = await exerciseService.replaceExerciseById(user!.userId, params.exerciseId, body);
 
-  res.status(200).json({
-    status: 'success',
+  return sendSuccess(res, 200, {
     data: exercise
   });
 };
@@ -215,7 +212,7 @@ export const deleteExercise = async (
   const { user, params } = req;
   await exerciseService.deleteExerciseById(user!.userId, params.exerciseId);
 
-  res.status(204).send();
+  return sendNoContent(res);
 };
 
 /**
@@ -255,8 +252,7 @@ export const getExerciseHistory = async (
   const { user, params } = req;
   const exerciseHistory = await exerciseService.getExerciseHistory(user!.userId, params.exerciseId);
 
-  res.status(200).json({
-    status: 'success',
+  return sendSuccess(res, 200, {
     data: exerciseHistory
   });
 };

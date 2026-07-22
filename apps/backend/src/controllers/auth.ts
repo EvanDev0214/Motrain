@@ -12,6 +12,7 @@ import type {
   VerifyPasswordOtpBody,
   ResetPasswordBody
 } from '@/schemas/auth';
+import { sendSuccess } from '@/utils/response';
 
 /**
  * @openapi
@@ -45,8 +46,7 @@ export const register = async (
 
   await emailVerificationService.sendOTP(newUser.id, newUser.email);
 
-  res.status(201).json({
-    status: 'success',
+  return sendSuccess(res, 201, {
     message: 'Verification email sent',
     data: {
       userId: newUser.id,
@@ -88,8 +88,7 @@ export const verifyEmailOTP = async (
 ) => {
   await authService.verifyEmailOTP(req.body);
 
-  res.status(200).json({
-    status: 'success',
+  return sendSuccess(res, 200, {
     message: 'Email verified successfully'
   });
 };
@@ -126,8 +125,7 @@ export const resendEmailOTP = async (
     await emailVerificationService.sendOTP(data.id, data.email);
   }
 
-  res.status(200).json({
-    status: 'success',
+  return sendSuccess(res, 200, {
     message: 'If this email is registered, a verification code has been sent'
   });
 };
@@ -162,8 +160,7 @@ export const login = async (
 ) => {
   const { accessToken, refreshToken } = await authService.login(req.body);
 
-  res.status(200).json({
-    status: 'success',
+  return sendSuccess(res, 200, {
     message: 'Login account successfully',
     data: {
       accessToken,
@@ -199,8 +196,7 @@ export const logout = async (
   const token = req.headers.authorization!.split(' ')[1]!;
   await authService.logout(token, req.user!.userId);
 
-  res.status(200).json({
-    status: 'success',
+  return sendSuccess(res, 200, {
     message: 'Logged out successfully'
   });
 };
@@ -232,8 +228,7 @@ export const refreshToken = async (
   const token = req.headers.authorization!.split(' ')[1]!;
   const { newAccessToken, newRefreshToken } = await authService.refreshToken(token, req.user!);
 
-  res.status(200).json({
-    status: 'success',
+  return sendSuccess(res, 200, {
     message: 'Token refreshed successfully',
     data: {
       accessToken: newAccessToken,
@@ -281,8 +276,7 @@ export const updatePassword = async (
     newPassword
   );
 
-  res.status(200).json({
-    status: 'success',
+  return sendSuccess(res, 200, {
     message: 'Password updated successfully'
   });
 };
@@ -315,8 +309,7 @@ export const forgotPassword = async (
 ) => {
   await authService.forgotPassword(req.body.email);
 
-  res.status(200).json({
-    status: 'success',
+  return sendSuccess(res, 200, {
     message: 'If this email is registered, a password reset code has been sent'
   });
 };
@@ -354,8 +347,7 @@ export const verifyPasswordOTP = async (
   const { email, otp } = req.body;
   const { resetToken } = await authService.verifyPasswordOTP(email, otp);
 
-  res.status(200).json({
-    status: 'success',
+  return sendSuccess(res, 200, {
     message: 'OTP verified successfully',
     data: {
       resetToken
@@ -396,8 +388,7 @@ export const resetPassword = async (
   const { user, body } = req;
   await authService.resetPassword(user!.userId, body.newPassword);
 
-  res.status(200).json({
-    status: 'success',
+  return sendSuccess(res, 200, {
     message: 'Password reset successfully'
   });
 };

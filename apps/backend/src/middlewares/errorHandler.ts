@@ -4,6 +4,7 @@ import { PostgresError } from 'pg-error-enum';
 import { AppError, ExternalServiceError, Validation422Error } from '@/utils/error';
 import { errorLogger, warnLogger } from '@/utils/logger';
 import { PG_UNIQUE_FIELD_LABELS } from '@/constants/dbField';
+import { sendError, sendInternalServerError } from '@/utils/response';
 
 export const errorHandler = (
   err: unknown,
@@ -12,8 +13,7 @@ export const errorHandler = (
   _next: NextFunction
 ) => {
   if (err instanceof Validation422Error) {
-    return res.status(422).json({
-      status: 'error',
+    return sendError(res, 422, {
       code: err.code,
       message: err.message,
       errors: err.errors
@@ -30,8 +30,7 @@ export const errorHandler = (
       stack: err.stack
     });
 
-    return res.status(err.statusCode).json({
-      status: 'error',
+    return sendError(res, err.statusCode, {
       code: err.code,
       message: err.message
     });
@@ -48,11 +47,7 @@ export const errorHandler = (
       cause: err.cause
     });
 
-    return res.status(500).json({
-      status: 'error',
-      code: 'INTERNAL_SERVER_ERROR',
-      message: 'An unexpected error occurred'
-    });
+    return sendInternalServerError(res);
   }
 
   if (err instanceof Error && err.cause instanceof DatabaseError) {
@@ -71,11 +66,7 @@ export const errorHandler = (
     cause: unknownErr.cause
   });
 
-  res.status(500).json({
-    status: 'error',
-    code: 'INTERNAL_SERVER_ERROR',
-    message: 'An unexpected error occurred'
-  });
+  return sendInternalServerError(res);
 };
 
 export const routerErrorHandler = (
@@ -89,8 +80,7 @@ export const routerErrorHandler = (
     message: `Cannot find ${req.originalUrl} route`
   });
 
-  res.status(404).json({
-    status: 'error',
+  return sendError(res, 404, {
     code: 'ROUTE_NOT_FOUND',
     message: `Cannot find ${req.originalUrl} route`
   });
@@ -110,8 +100,7 @@ export const jsonParseErrorHandler = (
       message: 'Invalid JSON format'
     });
 
-    return res.status(400).json({
-      status: 'error',
+    return sendError(res, 400, {
       code: 'INVALID_JSON',
       message: 'Invalid JSON format'
     });
@@ -130,8 +119,7 @@ const pgErrorHandler = (
     const field = detail?.match(/Key \((\w+)\)/)?.[1];
     const label = field ? PG_UNIQUE_FIELD_LABELS[field] : undefined;
 
-    return res.status(409).json({
-      status: 'error',
+    return sendError(res, 409, {
       code: label ? `${label.toUpperCase()}_EXISTS` : 'DUPLICATE_ENTRY',
       message: label ? `${label} already exists.` : 'Resource already exists.'
     });
@@ -147,9 +135,5 @@ const pgErrorHandler = (
     stack: err.stack
   });
 
-  res.status(500).json({
-    status: 'error',
-    code: 'INTERNAL_SERVER_ERROR',
-    message: 'An unexpected error occurred'
-  });
+  return sendInternalServerError(res);
 };

@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import { bodyWeightService } from '@/services/bodyWeight';
 import type { CreateBodyWeightBody, DeleteBodyWeightParams } from '@/schemas/bodyWeight';
+import { sendSuccess, sendNoContent } from '@/utils/response';
 
 /**
  * @openapi
@@ -28,8 +29,7 @@ export const getUserBodyWeights = async (
 ) => {
   const bodyWeightRecords = await bodyWeightService.getUserBodyWeights(req.user!.userId);
 
-  res.status(200).json({
-    status: 'success',
+  return sendSuccess(res, 200, {
     data: bodyWeightRecords
   });
 };
@@ -67,8 +67,7 @@ export const createUserBodyWeight = async (
   const { user, body } = req;
   const upsertedBodyWeight = await bodyWeightService.createUserBodyWeight(user!.userId, body);
 
-  res.status(201).json({
-    status: 'success',
+  return sendSuccess(res, 201, {
     data: upsertedBodyWeight
   });
 };
@@ -106,5 +105,5 @@ export const deleteUserBodyWeight = async (
   const { user, params } = req;
   await bodyWeightService.deleteUserBodyWeight(user!.userId, params.bodyWeightId);
 
-  res.status(204).send();
+  return sendNoContent(res);
 };
