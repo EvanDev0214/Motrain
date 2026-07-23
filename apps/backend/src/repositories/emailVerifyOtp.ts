@@ -5,7 +5,7 @@ import { eq, sql } from 'drizzle-orm';
 
 type UpsertEmailVerifyOtpData = Pick<typeof emailVerifyOtps.$inferInsert, 'userId' | 'email' | 'code'>;
 
-export const emailVerifyOtpsRepository = {
+export const emailVerifyOtpRepository = {
   upsert: async (data: UpsertEmailVerifyOtpData) => {
     const now = new Date();
     const expiresAt = new Date(now.getTime() + env.RESEND_OTP_EXPIRES_MINUTES * 60 * 1000);
@@ -42,4 +42,4 @@ export const emailVerifyOtpsRepository = {
   }
 };
 
-export type EmailVerifyOtpsRepo = typeof emailVerifyOtpsRepository;
+export type EmailVerifyOtpRepo = typeof emailVerifyOtpRepository;

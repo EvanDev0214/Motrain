@@ -6,7 +6,7 @@ import env from '@/configs/env';
 
 type UpsertRefreshTokenData = Pick<typeof refreshTokens.$inferInsert, 'userId' | 'refreshTokenHash'>;
 
-export const refreshTokensRepository = {
+export const refreshTokenRepository = {
   upsert: async (data: UpsertRefreshTokenData) => {
     const expiresMs = ms(env.JWT_REFRESH_EXPIRES_IN as StringValue);
     const now = new Date();
@@ -38,4 +38,4 @@ export const refreshTokensRepository = {
   }
 };
 
-export type RefreshTokensRepo = typeof refreshTokensRepository;
+export type RefreshTokenRepo = typeof refreshTokenRepository;
