@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { DatabaseError } from 'pg';
 import { PostgresError } from 'pg-error-enum';
-import { AppError, ExternalServiceError, Validation422Error } from '@/utils/error';
+import { AppError, ExternalServiceError, InternalServerError, Validation422Error } from '@/utils/error';
 import { errorLogger, warnLogger } from '@/utils/logger';
 import { PG_UNIQUE_FIELD_LABELS } from '@/constants/dbField';
 import { sendError, sendInternalServerError } from '@/utils/response';
@@ -18,6 +18,19 @@ export const errorHandler = (
       message: err.message,
       errors: err.errors
     });
+  }
+
+  if (err instanceof InternalServerError) {
+    errorLogger({
+      code: err.code,
+      statusCode: err.statusCode,
+      url: req.originalUrl,
+      method: req.method,
+      message: err.message,
+      stack: err.stack
+    });
+
+    return sendInternalServerError(res);
   }
 
   if (err instanceof AppError) {

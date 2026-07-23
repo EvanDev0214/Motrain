@@ -1,6 +1,6 @@
 import { bodyWeightRepository, type BodyWeightRepo } from '@/repositories/bodyWeight';
 import type { CreateBodyWeightBody } from '@/schemas/bodyWeight';
-import { NotFound404Error } from '@/utils/error';
+import { InternalServerError, NotFound404Error } from '@/utils/error';
 
 export class BodyWeightService {
   constructor(
@@ -15,7 +15,7 @@ export class BodyWeightService {
     const upsertedBodyWeight = await this.bodyWeightRepository.upsert({ userId, ...data });
 
     if (!upsertedBodyWeight) {
-      throw new Error('Failed to upsert body weight.');
+      throw new InternalServerError('Failed to upsert body weight.');
     }
 
     return upsertedBodyWeight;

@@ -13,7 +13,7 @@ import type {
   ReplaceUserWorkoutBody,
   ReplaceUserWorkoutExercisesBody
 } from '@/schemas/workout';
-import { NotFound404Error } from '@/utils/error';
+import { InternalServerError, NotFound404Error } from '@/utils/error';
 
 export class WorkoutService {
   constructor(
@@ -64,7 +64,7 @@ export class WorkoutService {
       const workoutExercise = createdWorkoutExercises.find(we => we.order === exercise.order);
 
       if (!workoutExercise) {
-        throw new Error('Failed to match workout exercise.');
+        throw new InternalServerError('Failed to match workout exercise.');
       }
 
       return exercise.sets.map(set => ({
@@ -78,8 +78,7 @@ export class WorkoutService {
     }
   }
 
-  // TODO: 這個命名有問題
-  async getWorkoutsByUserId(userId: UUID) {
+  async getWorkouts(userId: UUID) {
     return await this.workoutRepository.findAllByUserId(userId);
   }
 
@@ -93,7 +92,7 @@ export class WorkoutService {
     const workout = await this.workoutRepository.create({ userId, ...data });
 
     if (!workout) {
-      throw new Error('Failed to create workout.');
+      throw new InternalServerError('Failed to create workout.');
     }
 
     return workout;
@@ -137,7 +136,7 @@ export class WorkoutService {
     const updatedWorkout = await this.workoutRepository.replaceById(workoutId, data);
 
     if (!updatedWorkout) {
-      throw new Error('Failed to update workout');
+      throw new InternalServerError('Failed to update workout');
     }
 
     return updatedWorkout;

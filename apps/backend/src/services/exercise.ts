@@ -4,7 +4,7 @@ import { exerciseMuscleRepository, type ExerciseMuscleRepo } from '@/repositorie
 import { muscleRepository, type MuscleRepo } from '@/repositories/muscle';
 import type { CreateUserExerciseBody, ReplaceExerciseBody } from '@/schemas/exercise';
 import type { ExerciseHistoryRecord } from '@/@types/exercise';
-import { Forbidden403Error, NotFound404Error } from '@/utils/error';
+import { Forbidden403Error, InternalServerError, NotFound404Error } from '@/utils/error';
 
 export class ExerciseService {
   constructor(
@@ -48,7 +48,7 @@ export class ExerciseService {
       }, tx);
 
       if (!exercise) {
-        throw new Error('Failed to create exercise.');
+        throw new InternalServerError('Failed to create exercise.');
       }
 
       if (data.muscles.length > 0) {

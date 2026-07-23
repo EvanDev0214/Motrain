@@ -37,7 +37,7 @@ export const getWorkouts = async (
   req: Request,
   res: Response
 ) => {
-  const workouts = await workoutService.getWorkoutsByUserId(req.user!.userId);
+  const workouts = await workoutService.getWorkouts(req.user!.userId);
 
   return sendSuccess(res, 200, {
     data: workouts

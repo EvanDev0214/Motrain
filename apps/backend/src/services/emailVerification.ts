@@ -2,7 +2,7 @@ import env from '@/configs/env';
 import { emailService, type EmailService } from '@/services/email';
 import { emailVerifyOtpRepository, type EmailVerifyOtpRepo } from '@/repositories/emailVerifyOtp';
 import { generateOTP } from '@/utils/otp';
-import { BadRequest400Error } from '@/utils/error';
+import { BadRequest400Error, InternalServerError } from '@/utils/error';
 
 type OtpPurpose = 'email_verify' | 'password_reset';
 
@@ -36,7 +36,7 @@ export class EmailVerificationService {
         await this.emailService.sendPasswordResetOtpEmail(to, otp);
         break;
       default: {
-        throw new Error(`Unknown OTP purpose: ${purpose satisfies never}`);
+        throw new InternalServerError(`Unknown OTP purpose: ${purpose satisfies never}`);
       }
     }
   }
