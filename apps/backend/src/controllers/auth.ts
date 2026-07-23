@@ -3,12 +3,16 @@ import { authService } from '@/services/auth';
 import { emailVerificationService } from '@/services/emailVerification';
 import { userRepository } from '@/repositories/user';
 import type {
-  LoginRequest,
-  UpdatePasswordRequest,
-  ForgotPasswordRequest,
-  VerifyPasswordOtpRequest,
-  ResetPasswordRequest
+  RegisterBody,
+  VerifyEmailOtpBody,
+  ResendEmailOtpBody,
+  LoginBody,
+  UpdatePasswordBody,
+  ForgotPasswordBody,
+  VerifyPasswordOtpBody,
+  ResetPasswordBody
 } from '@/schemas/auth';
+import { sendSuccess } from '@/utils/response';
 
 /**
  * @openapi
@@ -35,21 +39,14 @@ import type {
  *         description: "`EMAIL_EXISTS` : Email already exists"
  */
 export const register = async (
-  req: Request,
+  req: Request<unknown, unknown, RegisterBody>,
   res: Response
 ) => {
-  const { nickname, email, password } = req.body;
-
-  const newUser = await authService.register({
-    nickname,
-    email,
-    password
-  });
+  const newUser = await authService.register(req.body);
 
   await emailVerificationService.sendOTP(newUser.id, newUser.email);
 
-  res.status(201).json({
-    status: 'success',
+  return sendSuccess(res, 201, {
     message: 'Verification email sent',
     data: {
       userId: newUser.id,
@@ -86,15 +83,12 @@ export const register = async (
  *           `OTP_MISMATCH` : OTP validation failed
  */
 export const verifyEmailOTP = async (
-  req: Request,
+  req: Request<unknown, unknown, VerifyEmailOtpBody>,
   res: Response
 ) => {
-  const { email, otp } = req.body;
+  await authService.verifyEmailOTP(req.body);
 
-  await authService.verifyEmailOTP(email, otp);
-
-  res.status(200).json({
-    status: 'success',
+  return sendSuccess(res, 200, {
     message: 'Email verified successfully'
   });
 };
@@ -122,19 +116,16 @@ export const verifyEmailOTP = async (
  *               $ref: '#/components/schemas/auth/resendEmailOtpSchema/response'
  */
 export const resendEmailOTP = async (
-  req: Request,
+  req: Request<unknown, unknown, ResendEmailOtpBody>,
   res: Response
 ) => {
-  const { email } = req.body;
-
-  const data = await userRepository.findByEmail(email);
+  const data = await userRepository.findByEmail(req.body.email);
 
   if (data && !data.emailVerifiedAt) {
-    await emailVerificationService.sendOTP(data.id, email);
+    await emailVerificationService.sendOTP(data.id, data.email);
   }
 
-  res.status(200).json({
-    status: 'success',
+  return sendSuccess(res, 200, {
     message: 'If this email is registered, a verification code has been sent'
   });
 };
@@ -164,15 +155,12 @@ export const resendEmailOTP = async (
  *         description: "`INVALID_CREDENTIALS` : Invalid email or password"
  */
 export const login = async (
-  req: Request<unknown, unknown, LoginRequest>,
+  req: Request<unknown, unknown, LoginBody>,
   res: Response
 ) => {
-  const { email, password } = req.body;
+  const { accessToken, refreshToken } = await authService.login(req.body);
 
-  const { accessToken, refreshToken } = await authService.login(email, password);
-
-  res.status(200).json({
-    status: 'success',
+  return sendSuccess(res, 200, {
     message: 'Login account successfully',
     data: {
       accessToken,
@@ -208,8 +196,7 @@ export const logout = async (
   const token = req.headers.authorization!.split(' ')[1]!;
   await authService.logout(token, req.user!.userId);
 
-  res.status(200).json({
-    status: 'success',
+  return sendSuccess(res, 200, {
     message: 'Logged out successfully'
   });
 };
@@ -241,8 +228,7 @@ export const refreshToken = async (
   const token = req.headers.authorization!.split(' ')[1]!;
   const { newAccessToken, newRefreshToken } = await authService.refreshToken(token, req.user!);
 
-  res.status(200).json({
-    status: 'success',
+  return sendSuccess(res, 200, {
     message: 'Token refreshed successfully',
     data: {
       accessToken: newAccessToken,
@@ -280,7 +266,7 @@ export const refreshToken = async (
  *         description: "`INVALID_TOKEN` : Invalid or expired access token"
  */
 export const updatePassword = async (
-  req: Request<unknown, unknown, UpdatePasswordRequest>,
+  req: Request<unknown, unknown, UpdatePasswordBody>,
   res: Response
 ) => {
   const { oldPassword, newPassword } = req.body;
@@ -290,8 +276,7 @@ export const updatePassword = async (
     newPassword
   );
 
-  res.status(200).json({
-    status: 'success',
+  return sendSuccess(res, 200, {
     message: 'Password updated successfully'
   });
 };
@@ -319,14 +304,12 @@ export const updatePassword = async (
  *               $ref: '#/components/schemas/auth/forgotPasswordSchema/response'
  */
 export const forgotPassword = async (
-  req: Request<unknown, unknown, ForgotPasswordRequest>,
+  req: Request<unknown, unknown, ForgotPasswordBody>,
   res: Response
 ) => {
-  const { email } = req.body;
-  await authService.forgotPassword(email);
+  await authService.forgotPassword(req.body.email);
 
-  res.status(200).json({
-    status: 'success',
+  return sendSuccess(res, 200, {
     message: 'If this email is registered, a password reset code has been sent'
   });
 };
@@ -358,14 +341,13 @@ export const forgotPassword = async (
  *           - `OTP_MISMATCH` : OTP validation failed
  */
 export const verifyPasswordOTP = async (
-  req: Request<unknown, unknown, VerifyPasswordOtpRequest>,
+  req: Request<unknown, unknown, VerifyPasswordOtpBody>,
   res: Response
 ) => {
   const { email, otp } = req.body;
   const { resetToken } = await authService.verifyPasswordOTP(email, otp);
 
-  res.status(200).json({
-    status: 'success',
+  return sendSuccess(res, 200, {
     message: 'OTP verified successfully',
     data: {
       resetToken
@@ -400,14 +382,13 @@ export const verifyPasswordOTP = async (
  *         description: "`INVALID_TOKEN` : Invalid or expired reset token"
  */
 export const resetPassword = async (
-  req: Request<unknown, unknown, ResetPasswordRequest>,
+  req: Request<unknown, unknown, ResetPasswordBody>,
   res: Response
 ) => {
-  const { newPassword } = req.body;
-  await authService.resetPassword(req.user!.userId, newPassword);
+  const { user, body } = req;
+  await authService.resetPassword(user!.userId, body.newPassword);
 
-  res.status(200).json({
-    status: 'success',
+  return sendSuccess(res, 200, {
     message: 'Password reset successfully'
   });
 };

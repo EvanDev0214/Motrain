@@ -6,8 +6,7 @@ type CreateWorkoutData = Omit<typeof workouts.$inferInsert, 'id' | 'createdAt' |
 type ReplaceWorkoutData = Omit<CreateWorkoutData, 'userId'>;
 
 export const workoutRepository = {
-  // TODO: 這個命名有問題
-  findByUserId: async (userId: UUID) => {
+  findAllByUserId: async (userId: UUID) => {
     return await db.select({
       id: workouts.id,
       name: workouts.name,
@@ -23,7 +22,7 @@ export const workoutRepository = {
     return workout ?? null;
   },
 
-  findOneById: async (workoutId: UUID) => {
+  findById: async (workoutId: UUID) => {
     const workout = await db.query.workouts.findFirst({
       where: eq(workouts.id, workoutId),
       with: {

@@ -1,7 +1,6 @@
 import z from 'zod';
 import { rpeEnum, setTypeEnum } from '@/db/schemas';
-
-const weightSchema = z.string().regex(/^\d{1,4}(\.\d{1,2})?$/, { message: '請輸入有效範圍的數字' }).nullable();
+import { uuidField, weightField } from '@/schemas/common';
 
 const validateSequentialOrder = <T extends { order: number }>(items: T[], ctx: z.RefinementCtx) => {
   items.forEach((item, i) => {
@@ -40,7 +39,7 @@ export const createUserWorkoutSchema = z.object({
 
 export const getWorkoutSchema = z.object({
   params: z.object({
-    workoutId: z.uuid('請提供有效的 UUID')
+    workoutId: uuidField
   })
 });
 
@@ -48,16 +47,16 @@ export const createUserWorkoutExercisesSchema = z.object({
   body: z.object({
     exercises: z.array(
       z.object({
-        exerciseId: z.uuid('請提供有效的 UUID'),
+        exerciseId: uuidField,
         order: z.number().int().min(1),
-        supersetId: z.uuid('請提供有效的 UUID').nullable(),
+        supersetId: uuidField.nullable(),
         sets: z.array(
           z.object({
             setType: z.enum(setTypeEnum.enumValues),
             order: z.number().int().min(1),
-            weight: weightSchema,
-            weightLeft: weightSchema,
-            weightRight: weightSchema,
+            weight: weightField.nullable(),
+            weightLeft: weightField.nullable(),
+            weightRight: weightField.nullable(),
             reps: z.number().int().min(0).nullable(),
             rpe: z.enum(rpeEnum.enumValues).nullable(),
             note: z.string().nullable(),
@@ -69,14 +68,14 @@ export const createUserWorkoutExercisesSchema = z.object({
       .superRefine(validateSequentialOrder)
   }),
   params: z.object({
-    workoutId: z.uuid('請提供有效的 UUID')
+    workoutId: uuidField
   })
 });
 
 export const replaceUserWorkoutSchema = z.object({
   body: createUserWorkoutSchema.shape.body,
   params: z.object({
-    workoutId: z.uuid('請提供有效的 UUID')
+    workoutId: uuidField
   })
 });
 

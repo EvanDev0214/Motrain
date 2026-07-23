@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import { userService } from '@/services/user';
 import type { UpdateUserProfileBody } from '@/schemas/user';
+import { sendSuccess } from '@/utils/response';
 
 export const getMe = async (
   req: Request,
@@ -8,8 +9,7 @@ export const getMe = async (
 ) => {
   const user = await userService.getMe(req.user!.userId);
 
-  res.status(200).json({
-    status: 'success',
+  return sendSuccess(res, 200, {
     data: user
   });
 };
@@ -21,8 +21,7 @@ export const updateUserProfile = async (
   const { user, body } = req;
   const updated = await userService.updateUserProfile(user!.userId, body);
 
-  res.status(200).json({
-    status: 'success',
+  return sendSuccess(res, 200, {
     data: updated
   });
 };

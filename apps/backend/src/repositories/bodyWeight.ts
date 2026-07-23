@@ -16,7 +16,7 @@ export const bodyWeightRepository = {
       .orderBy(desc(bodyWeights.recordedAt));
   },
 
-  findOneById: async (bodyWeightId: UUID) => {
+  findById: async (bodyWeightId: UUID) => {
     const bodyWeight = await db.query.bodyWeights.findFirst({
       where: eq(bodyWeights.id, bodyWeightId)
     });

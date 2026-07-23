@@ -86,9 +86,11 @@ export const resetPasswordSchema = z.object({
   })
 });
 
-export type RegisterInput = Omit<z.infer<typeof registerSchema>['body'], 'confirmPassword'>;
-export type LoginRequest = z.infer<typeof loginSchema>['body'];
-export type UpdatePasswordRequest = z.infer<typeof updatePasswordSchema>['body'];
-export type ForgotPasswordRequest = z.infer<typeof forgotPasswordSchema>['body'];
-export type VerifyPasswordOtpRequest = z.infer<typeof verifyPasswordOtpSchema>['body'];
-export type ResetPasswordRequest = z.infer<typeof resetPasswordSchema>['body'];
+export type RegisterBody = Omit<z.infer<typeof registerSchema>['body'], 'confirmPassword'>;
+export type VerifyEmailOtpBody = z.infer<typeof verifyEmailOtpSchema>['body'];
+export type ResendEmailOtpBody = z.infer<typeof resendEmailOtpSchema>['body'];
+export type LoginBody = z.infer<typeof loginSchema>['body'];
+export type UpdatePasswordBody = z.infer<typeof updatePasswordSchema>['body'];
+export type ForgotPasswordBody = z.infer<typeof forgotPasswordSchema>['body'];
+export type VerifyPasswordOtpBody = z.infer<typeof verifyPasswordOtpSchema>['body'];
+export type ResetPasswordBody = z.infer<typeof resetPasswordSchema>['body'];

@@ -20,20 +20,22 @@ import {
 
 const workoutsRouter = Router();
 
+workoutsRouter.use(authMiddleware('ACCESS'));
+
 workoutsRouter
   .route('/')
-  .get(authMiddleware('ACCESS'), getWorkouts)
-  .post(authMiddleware('ACCESS'), validateMiddleware(createUserWorkoutSchema), createUserWorkout);
+  .get(getWorkouts)
+  .post(validateMiddleware(createUserWorkoutSchema), createUserWorkout);
 
 workoutsRouter
   .route('/:workoutId')
-  .get(authMiddleware('ACCESS'), validateMiddleware(getWorkoutSchema), getWorkout)
-  .put(authMiddleware('ACCESS'), validateMiddleware(replaceUserWorkoutSchema), replaceUserWorkout)
-  .delete(authMiddleware('ACCESS'), validateMiddleware(deleteUserWorkoutSchema), deleteUserWorkout);
+  .get(validateMiddleware(getWorkoutSchema), getWorkout)
+  .put(validateMiddleware(replaceUserWorkoutSchema), replaceUserWorkout)
+  .delete(validateMiddleware(deleteUserWorkoutSchema), deleteUserWorkout);
 
 workoutsRouter
   .route('/:workoutId/exercises')
-  .post(authMiddleware('ACCESS'), validateMiddleware(createUserWorkoutExercisesSchema), createUserWorkoutExercises)
-  .put(authMiddleware('ACCESS'), validateMiddleware(replaceUserWorkoutExercisesSchema), replaceUserWorkoutExercises);
+  .post(validateMiddleware(createUserWorkoutExercisesSchema), createUserWorkoutExercises)
+  .put(validateMiddleware(replaceUserWorkoutExercisesSchema), replaceUserWorkoutExercises);
 
 export default workoutsRouter;

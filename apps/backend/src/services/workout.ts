@@ -13,7 +13,7 @@ import type {
   ReplaceUserWorkoutBody,
   ReplaceUserWorkoutExercisesBody
 } from '@/schemas/workout';
-import { NotFound404Error } from '@/utils/error';
+import { InternalServerError, NotFound404Error } from '@/utils/error';
 
 export class WorkoutService {
   constructor(
@@ -25,7 +25,7 @@ export class WorkoutService {
   ) {}
 
   private async findUserWorkoutOrThrow(userId: UUID, workoutId: UUID) {
-    const workout = await this.workoutRepository.findOneById(workoutId);
+    const workout = await this.workoutRepository.findById(workoutId);
 
     if (!workout) {
       throw new NotFound404Error('The workout does not exist or has been deleted.', 'WORKOUT_NOT_FOUND');
@@ -46,7 +46,7 @@ export class WorkoutService {
   ) {
     const uniqueExerciseIds = [... new Set(data.exercises.map(exercise => exercise.exerciseId))];
 
-    const exercises = await this.exerciseRepository.findManyByIds(uniqueExerciseIds, userId);
+    const exercises = await this.exerciseRepository.findAllByIds(uniqueExerciseIds, userId);
 
     if (exercises.length !== uniqueExerciseIds.length) {
       throw new NotFound404Error('The exercise does not exist or has been deleted.', 'EXERCISE_NOT_FOUND');
@@ -64,7 +64,7 @@ export class WorkoutService {
       const workoutExercise = createdWorkoutExercises.find(we => we.order === exercise.order);
 
       if (!workoutExercise) {
-        throw new Error('Failed to match workout exercise.');
+        throw new InternalServerError('Failed to match workout exercise.');
       }
 
       return exercise.sets.map(set => ({
@@ -78,9 +78,8 @@ export class WorkoutService {
     }
   }
 
-  // TODO: 這個命名有問題
-  async getWorkoutsByUserId(userId: UUID) {
-    return await this.workoutRepository.findByUserId(userId);
+  async getWorkouts(userId: UUID) {
+    return await this.workoutRepository.findAllByUserId(userId);
   }
 
   async getWorkoutDetails(userId: UUID, workoutId: UUID) {
@@ -93,7 +92,7 @@ export class WorkoutService {
     const workout = await this.workoutRepository.create({ userId, ...data });
 
     if (!workout) {
-      throw new Error('Failed to create workout.');
+      throw new InternalServerError('Failed to create workout.');
     }
 
     return workout;
@@ -110,7 +109,7 @@ export class WorkoutService {
       await this.saveWorkoutExercises(userId, workout.id, data, tx);
     });
 
-    return await this.workoutRepository.findOneById(workoutId);
+    return await this.workoutRepository.findById(workoutId);
   }
 
   async replaceUserWorkoutExercises(
@@ -125,7 +124,7 @@ export class WorkoutService {
       await this.saveWorkoutExercises(userId, workout.id, data, tx);
     });
 
-    return await this.workoutRepository.findOneById(workoutId);
+    return await this.workoutRepository.findById(workoutId);
   }
 
   async replaceUserWorkout(
@@ -137,7 +136,7 @@ export class WorkoutService {
     const updatedWorkout = await this.workoutRepository.replaceById(workoutId, data);
 
     if (!updatedWorkout) {
-      throw new Error('Failed to update workout');
+      throw new InternalServerError('Failed to update workout');
     }
 
     return updatedWorkout;

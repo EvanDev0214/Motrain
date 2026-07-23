@@ -5,9 +5,11 @@ import { updateUserProfileSchema } from '@/schemas/user';
 
 const usersRouter = Router();
 
+usersRouter.use(authMiddleware('ACCESS'));
+
 usersRouter
   .route('/me')
-  .get(authMiddleware('ACCESS'), getMe)
-  .patch(authMiddleware('ACCESS'), validateMiddleware(updateUserProfileSchema), updateUserProfile);
+  .get(getMe)
+  .patch(validateMiddleware(updateUserProfileSchema), updateUserProfile);
 
 export default usersRouter;

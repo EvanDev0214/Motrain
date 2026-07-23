@@ -1,5 +1,6 @@
 import { userRepository, type UserRepo } from '@/repositories/user';
 import type { UpdateUserProfileBody } from '@/schemas/user';
+import { InternalServerError } from '@/utils/error';
 
 export class UserService {
   constructor(
@@ -10,7 +11,7 @@ export class UserService {
     const user = await this.userRepository.findById(userId);
 
     if (!user) {
-      throw new Error('Failed to query user.');
+      throw new InternalServerError('Failed to query user.');
     }
 
     return {

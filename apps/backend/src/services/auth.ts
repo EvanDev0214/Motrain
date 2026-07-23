@@ -1,7 +1,11 @@
 import argon2 from 'argon2';
-import type { RegisterInput } from '@/schemas/auth';
+import type {
+  LoginBody,
+  RegisterBody,
+  VerifyEmailOtpBody
+} from '@/schemas/auth';
 import { userRepository, type UserRepo } from '@/repositories/user';
-import { refreshTokensRepository, type RefreshTokensRepository } from '@/repositories/refreshTokens';
+import { refreshTokenRepository, type RefreshTokenRepo } from '@/repositories/refreshToken';
 import { BadRequest400Error, Unauthorized401Error } from '@/utils/error';
 import { generateJwt } from '@/utils/jwt';
 import { emailVerificationService, type EmailVerificationService } from '@/services/emailVerification';
@@ -10,12 +14,12 @@ import { emailService, type EmailService } from '@/services/email';
 class AuthService {
   constructor(
     private userRepository: UserRepo,
-    private refreshTokensRepository: RefreshTokensRepository,
+    private refreshTokenRepository: RefreshTokenRepo,
     private emailVerificationService: EmailVerificationService,
     private emailService: EmailService
   ) {}
 
-  async register(data: RegisterInput) {
+  async register(data: RegisterBody) {
     const passwordHash = await argon2.hash(data.password);
 
     const newUser = await this.userRepository.create({
@@ -27,14 +31,14 @@ class AuthService {
     return newUser;
   }
 
-  async login(email: Email, password: string) {
-    const user = await this.userRepository.findByEmail(email);
+  async login(data: LoginBody) {
+    const user = await this.userRepository.findByEmail(data.email);
 
     if (!user || !user.emailVerifiedAt) {
       throw new Unauthorized401Error('Invalid email or password', 'INVALID_CREDENTIALS');
     }
 
-    const passwordCheck = await argon2.verify(user.passwordHash, password);
+    const passwordCheck = await argon2.verify(user.passwordHash, data.password);
 
     if (!passwordCheck) {
       throw new Unauthorized401Error('Invalid email or password', 'INVALID_CREDENTIALS');
@@ -44,7 +48,7 @@ class AuthService {
     const refreshToken = generateJwt('REFRESH', { email: user.email, userId: user.id });
     const refreshTokenHash = await argon2.hash(refreshToken);
 
-    await this.refreshTokensRepository.upsert(user.id, refreshTokenHash);
+    await this.refreshTokenRepository.upsert({ userId: user.id, refreshTokenHash });
 
     return {
       accessToken,
@@ -53,7 +57,7 @@ class AuthService {
   }
 
   async refreshToken(token: string, payload: UserJwtPayload) {
-    const storedToken = await this.refreshTokensRepository.findByUserId(payload.userId);
+    const storedToken = await this.refreshTokenRepository.findByUserId(payload.userId);
 
     if (!storedToken) {
       throw new Unauthorized401Error('Invalid request, please login again', 'INVALID_TOKEN');
@@ -75,13 +79,13 @@ class AuthService {
     });
 
     const refreshTokenHash = await argon2.hash(newRefreshToken);
-    await this.refreshTokensRepository.upsert(payload.userId, refreshTokenHash);
+    await this.refreshTokenRepository.upsert({ userId: payload.userId, refreshTokenHash });
 
     return { newAccessToken, newRefreshToken };
   }
 
   async logout(token: string, userId: UUID) {
-    const storedToken = await this.refreshTokensRepository.findByUserId(userId);
+    const storedToken = await this.refreshTokenRepository.findByUserId(userId);
 
     if (!storedToken) {
       throw new Unauthorized401Error('Invalid request, please login again', 'INVALID_TOKEN');
@@ -93,7 +97,7 @@ class AuthService {
       throw new Unauthorized401Error('Invalid request, please login again', 'INVALID_TOKEN');
     }
 
-    await this.refreshTokensRepository.deleteByUserId(userId);
+    await this.refreshTokenRepository.deleteByUserId(userId);
   }
 
   async updatePassword(
@@ -117,8 +121,8 @@ class AuthService {
     await this.userRepository.updatePasswordByUserId(userId, passwordHash);
   }
 
-  async verifyEmailOTP(email: Email, otp: string) {
-    const { userId } = await this.emailVerificationService.verifyOTP(email, otp);
+  async verifyEmailOTP(data: VerifyEmailOtpBody) {
+    const { userId } = await this.emailVerificationService.verifyOTP(data.email, data.otp);
     await this.userRepository.markEmailAsVerified(userId);
   }
 
@@ -150,7 +154,7 @@ class AuthService {
     const passwordHash = await argon2.hash(newPassword);
     await this.userRepository.updatePasswordByUserId(userId, passwordHash);
 
-    await this.refreshTokensRepository.deleteByUserId(userId);
+    await this.refreshTokenRepository.deleteByUserId(userId);
 
     await this.emailService.sendPasswordResetConfirmationEmail(user.email);
   }
@@ -166,7 +170,7 @@ class AuthService {
 
 export const authService = new AuthService(
   userRepository,
-  refreshTokensRepository,
+  refreshTokenRepository,
   emailVerificationService,
   emailService
 );

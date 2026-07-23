@@ -1,12 +1,9 @@
 import { eq } from 'drizzle-orm';
 import { db } from '@/db/db';
 import { users } from '@/db/schemas/users';
-import type { RegisterInput } from '@/schemas/auth';
 
 type UpdateUserData = Partial<Pick<typeof users.$inferInsert, 'nickname' | 'avatarUrl' | 'weightUnit'>>;
-type CreateUserData = Omit<RegisterInput, 'password'> & {
-  passwordHash: string
-};
+type CreateUserData = Pick<typeof users.$inferInsert, 'email' | 'nickname' | 'passwordHash'>;
 
 export const userRepository = {
   create: async (data: CreateUserData) => {

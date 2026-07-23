@@ -4,8 +4,10 @@ import { getMuscles } from '@/controllers/muscle';
 
 const musclesRouter = Router();
 
+musclesRouter.use(authMiddleware('ACCESS'));
+
 musclesRouter
   .route('/')
-  .get(authMiddleware('ACCESS'), getMuscles);
+  .get(getMuscles);
 
 export default musclesRouter;

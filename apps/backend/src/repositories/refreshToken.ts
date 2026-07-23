@@ -4,20 +4,22 @@ import ms, { type StringValue } from 'ms';
 import { refreshTokens } from '@/db/schemas/refreshTokens';
 import env from '@/configs/env';
 
-export const refreshTokensRepository = {
-  upsert: async (userId: UUID, refreshTokenHash: string) => {
+type UpsertRefreshTokenData = Pick<typeof refreshTokens.$inferInsert, 'userId' | 'refreshTokenHash'>;
+
+export const refreshTokenRepository = {
+  upsert: async (data: UpsertRefreshTokenData) => {
     const expiresMs = ms(env.JWT_REFRESH_EXPIRES_IN as StringValue);
     const now = new Date();
     const expiresAt = new Date(now.getTime() + expiresMs);
 
     await db.insert(refreshTokens).values({
-      userId,
-      refreshTokenHash,
+      userId: data.userId,
+      refreshTokenHash: data.refreshTokenHash,
       expiresAt
     }).onConflictDoUpdate({
       target: refreshTokens.userId,
       set: {
-        refreshTokenHash,
+        refreshTokenHash: data.refreshTokenHash,
         createdAt: now,
         expiresAt
       }
@@ -36,4 +38,4 @@ export const refreshTokensRepository = {
   }
 };
 
-export type RefreshTokensRepository = typeof refreshTokensRepository;
+export type RefreshTokenRepo = typeof refreshTokenRepository;

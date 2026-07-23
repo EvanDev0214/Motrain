@@ -11,6 +11,7 @@ import type {
   ReplaceUserWorkoutParams
 } from '@/schemas/workout';
 import { workoutService } from '@/services/workout';
+import { sendSuccess, sendNoContent } from '@/utils/response';
 
 /**
  * @openapi
@@ -36,10 +37,9 @@ export const getWorkouts = async (
   req: Request,
   res: Response
 ) => {
-  const workouts = await workoutService.getWorkoutsByUserId(req.user!.userId);
+  const workouts = await workoutService.getWorkouts(req.user!.userId);
 
-  res.status(200).json({
-    status: 'success',
+  return sendSuccess(res, 200, {
     data: workouts
   });
 };
@@ -77,8 +77,7 @@ export const createUserWorkout = async (
   const { user, body } = req;
   const workout = await workoutService.createUserWorkout(user!.userId, body);
 
-  res.status(201).json({
-    status: 'success',
+  return sendSuccess(res, 201, {
     data: workout
   });
 };
@@ -120,8 +119,7 @@ export const getWorkout = async (
   const { user, params } = req;
   const workout = await workoutService.getWorkoutDetails(user!.userId, params.workoutId);
 
-  res.status(200).json({
-    status: 'success',
+  return sendSuccess(res, 200, {
     data: workout
   });
 };
@@ -169,8 +167,7 @@ export const createUserWorkoutExercises = async (
   const { user, params, body } = req;
   const workout = await workoutService.createUserWorkoutExercises(user!.userId, params.workoutId, body);
 
-  res.status(201).json({
-    status: 'success',
+  return sendSuccess(res, 201, {
     data: workout
   });
 };
@@ -218,8 +215,7 @@ export const replaceUserWorkoutExercises = async (
   const { user, params, body } = req;
   const updatedWorkout = await workoutService.replaceUserWorkoutExercises(user!.userId, params.workoutId, body);
 
-  res.status(200).json({
-    status: 'success',
+  return sendSuccess(res, 200, {
     data: updatedWorkout
   });
 };
@@ -267,8 +263,7 @@ export const replaceUserWorkout = async (
   const { user, params, body } = req;
   const updatedWorkout = await workoutService.replaceUserWorkout(user!.userId, params.workoutId, body);
 
-  res.status(200).json({
-    status: 'success',
+  return sendSuccess(res, 200, {
     data: updatedWorkout
   });
 };
@@ -306,5 +301,5 @@ export const deleteUserWorkout = async (
   const { user, params } = req;
   await workoutService.deleteUserWorkout(user!.userId, params.workoutId);
 
-  res.status(204).send();
+  return sendNoContent(res);
 };

@@ -1,9 +1,10 @@
 import z from 'zod';
 import dayjs from '@/configs/dayjs';
+import { uuidField, weightField } from '@/schemas/common';
 
 export const createBodyWeightSchema = z.object({
   body: z.object({
-    weight: z.string().regex(/^\d{1,4}(\.\d{1,2})?$/, { message: '請輸入有效範圍的數字' }),
+    weight: weightField,
     recordedAt: z.string().refine(
       val => dayjs(val).isValid(),
       { message: '請提供有效的日期格式' }
@@ -13,7 +14,7 @@ export const createBodyWeightSchema = z.object({
 
 export const deleteBodyWeightSchema = z.object({
   params: z.object({
-    bodyWeightId: z.uuid('請提供有效的 UUID')
+    bodyWeightId: uuidField
   })
 });
 

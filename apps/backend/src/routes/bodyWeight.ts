@@ -5,13 +5,15 @@ import { getUserBodyWeights, createUserBodyWeight, deleteUserBodyWeight } from '
 
 const bodyWeightsRouter = Router();
 
+bodyWeightsRouter.use(authMiddleware('ACCESS'));
+
 bodyWeightsRouter
   .route('/')
-  .get(authMiddleware('ACCESS'), getUserBodyWeights)
-  .post(authMiddleware('ACCESS'), validateMiddleware(createBodyWeightSchema), createUserBodyWeight);
+  .get(getUserBodyWeights)
+  .post(validateMiddleware(createBodyWeightSchema), createUserBodyWeight);
 
 bodyWeightsRouter
   .route('/:bodyWeightId')
-  .delete(authMiddleware('ACCESS'), validateMiddleware(deleteBodyWeightSchema), deleteUserBodyWeight);
+  .delete(validateMiddleware(deleteBodyWeightSchema), deleteUserBodyWeight);
 
 export default bodyWeightsRouter;

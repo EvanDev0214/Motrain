@@ -3,24 +3,22 @@ import { db } from '@/db/db';
 import { emailVerifyOtps } from '@/db/schemas/emailVerifyOtps';
 import { eq, sql } from 'drizzle-orm';
 
-export const emailVerifyOtpsRepository = {
-  upsert: async (
-    userId: UUID,
-    email: Email,
-    otp: string
-  ) => {
+type UpsertEmailVerifyOtpData = Pick<typeof emailVerifyOtps.$inferInsert, 'userId' | 'email' | 'code'>;
+
+export const emailVerifyOtpRepository = {
+  upsert: async (data: UpsertEmailVerifyOtpData) => {
     const now = new Date();
     const expiresAt = new Date(now.getTime() + env.RESEND_OTP_EXPIRES_MINUTES * 60 * 1000);
 
     await db.insert(emailVerifyOtps).values({
-      userId,
-      email,
-      code: otp,
+      userId: data.userId,
+      email: data.email,
+      code: data.code,
       expiresAt
     }).onConflictDoUpdate({
       target: emailVerifyOtps.userId,
       set: {
-        code: otp,
+        code: data.code,
         attempts: 0,
         expiresAt,
         createdAt: now
@@ -44,4 +42,4 @@ export const emailVerifyOtpsRepository = {
   }
 };
 
-export type EmailVerifyOtpsRepository = typeof emailVerifyOtpsRepository;
+export type EmailVerifyOtpRepo = typeof emailVerifyOtpRepository;
